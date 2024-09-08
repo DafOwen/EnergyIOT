@@ -1,0 +1,154 @@
+{
+  "TriggersForDb": [
+    {
+      "id": "1",
+      "Name": "Over 14 price",
+      "Interval": "PerPrice",
+      "Type": "Price_Above",
+      "Order": 1,
+      "Active": false,
+      "Value": 14,
+      "ActionIDs": [ 3, 4 ]
+    },
+    {
+      "id": "2",
+      "Name": "Lowest 4 no sections for day",
+      "Interval": "PerPrice",
+      "Type": "Section_Low",
+      "Order": 2,
+      "Active": true,
+      "Value": 4,
+      "ActionIDs": [ 1, 2 ]
+    },
+    {
+      "id": "3",
+      "Name": "Below 0 pence",
+      "Interval": "PerPrice",
+      "Type": "Price_Below",
+      "Order": 3,
+      "Active": true,
+      "Value": 0,
+      "ActionIDs": [ 1, 2 ]
+    },
+    {
+      "id": "4",
+      "Name": "Below 13 pence",
+      "Interval": "PerPrice",
+      "Type": "Price_Below",
+      "Order": 4,
+      "Active": false,
+      "Value": 13,
+      "ActionIDs": [ 1, 2 ]
+    },
+    {
+      "id": "5",
+      "Name": "Over the daily Average",
+      "Interval": "PerPrice",
+      "Type": "Average_Above",
+      "Order": 5,
+      "Active": true,
+      "Value": null,
+      "ActionIDs": [ 3, 4 ]
+    },
+    {
+      "id": "6",
+      "Name": "Below the daily Average",
+      "Interval": "PerPrice",
+      "Type": "Average_Below",
+      "Order": 6,
+      "Active": false,
+      "Value": null,
+      "ActionIDs": [ 1, 2 ]
+    },
+    {
+      "id": "7",
+      "Name": "Hourly Notify Lowest 4 Section",
+      "Interval": "Hourly",
+      "Type": "Hourly_NotifyLowestSection",
+      "Order": 7,
+      "Active": true,
+      "Value": 4,
+      "ActionIDs": [ 5 ]
+    },
+    {
+      "id": "8",
+      "Name": "Hourly Below Zero",
+      "Interval": "Hourly",
+      "Type": "Hourly_NotifyPricesBelowValue",
+      "Order": 8,
+      "Active": true,
+      "Value": 0,
+      "ActionIDs": [ 5 ]
+    },
+    {
+      "id": "9",
+      "Name": "Hourly Notify Prices",
+      "Interval": "Hourly",
+      "Type": "Hourly_NotifyPricesList",
+      "Order": 9,
+      "Active": true,
+      "Value": 0,
+      "ActionIDs": [ 5 ]
+    }
+
+  ],
+
+
+  "ActionsForDb": [
+    {
+      "Itemid": 1,
+      "Groupname": "Kasa",
+      "Itemname": "Bedroom Plug",
+      "Stateto": 1, //on
+      "Groupid": 1,
+      "Deviceid": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "Type": "Plug"
+    },
+    {
+      "Itemid": 2,
+      "Groupname": "Kasa",
+      "Itemname": "Lounge Plug",
+      "Stateto": 1, //on
+      "Groupid": 1,
+      "Deviceid": "??????????????????????????????????????????????",
+      "Type": "Plug"
+    },
+    {
+      "Itemid": 3,
+      "Groupname": "Kasa",
+      "Itemname": "Bedroom Plug",
+      "Stateto": 0, //off
+      "Groupid": 1,
+      "Deviceid": "????????????????????????????????????????????????",
+      "Type": "Plug"
+    },
+    {
+      "Itemid": 4,
+      "Groupname": "Kasa",
+      "Itemname": "Lounge Plug",
+      "Stateto": 0, //off
+      "Groupid": 1,
+      "Deviceid": "????????????????????????????????????????????????",
+      "Type": "Plug"
+    },
+    {
+      "Itemid": 5,
+      "Groupname": "Email",
+      "Itemname": "Email Info",
+      "Stateto": 0,
+      "Groupid": 2,
+      "Deviceid": "",
+      "Type": "Email"
+    }
+  ],
+
+
+  "exclude": [
+    "**/bin",
+    "**/bower_components",
+    "**/jspm_packages",
+    "**/node_modules",
+    "**/obj",
+    "**/platforms"
+  ]
+}

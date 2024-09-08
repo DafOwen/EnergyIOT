@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "EnergyIOTDataSetup": {
+      "commandName": "Project",
+      "commandLineArgs": "/KR"
+    }
+  }
+}
