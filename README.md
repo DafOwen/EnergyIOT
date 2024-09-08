@@ -61,7 +61,7 @@ Notes on [Azure Function pricing](https://azure.microsoft.com/en-in/pricing/deta
 
 ### Configuration Files
 There are several configuration files.
-In order to avoid loading private data to GitHub I've coped and renamed some file and put their original versions in the gitignore file.
+In order to avoid loading private data to GitHub I've copied and renamed these files and put their original versions in the gitignore file.
 So you will need to rename these.
 
 #### EnergyIOT
@@ -289,6 +289,17 @@ With Data payload:
 And header: `Content-Type: application/json`
 
 Check the `appServerUrl` value of the response, the URL can/is different from the above authentication calls e.g. `https://eu-wap.tplinkcloud.com`
+
+<br>
+
+## Email
+several elements use E-mail. Either to notify me daily of the next day's new prices or to notify me of any issues.
+
+For this I've used my personal gmail account.
+
+Rather than having to code for OAuth authentication I've gone the slightly easier route:
+
+My Gmail account has two factor authentication switched on, and so for these functions I've created a seperate App-password. You can find some [instructions here on Google](https://support.google.com/mail/answer/185833?hl=en-GB). I believe similar functionality is available via Office365 etc.
 
 <br>
 
