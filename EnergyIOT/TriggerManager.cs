@@ -9,8 +9,11 @@ namespace EnergyIOT
         private readonly ILogger _logger = logger;
         private List<ActionFailure> _actionFailures;
         private EmailConfig _emailConfig;
+        private List<EnergyPrice> energyDailyPricesDB = [];
+        private int utcEndHour = 0;
 
-//-----------------------Trigger MANAGERS ---------------------
+
+        //-----------------------Trigger MANAGERS ---------------------
 
         /// <summary>
         /// Price Manager - Fetch then call the per price (30min) Triggers
@@ -180,11 +183,11 @@ namespace EnergyIOT
             {
                 NotifyErrors();
             }
-            
+
 
         }//Trigger_Hourly_Manager
 
- //-----------------------HOURLY Triggers ---------------------
+        //-----------------------HOURLY Triggers ---------------------
 
         /// <summary>
         /// Trigger (Hourly) to notify of energy prices below value - likely 0
@@ -322,7 +325,7 @@ namespace EnergyIOT
         }
 
 
-//--------------------Per price (30min) triggers----------------------------
+        //--------------------Per price (30min) triggers----------------------------
 
         /// <summary>
         /// Trigger (30min) if energy price is above or below value in trigger - handles both
@@ -483,7 +486,7 @@ namespace EnergyIOT
             //"Average_Above"
             if (triggerItem.Type.Contains("Above"))
             {
-                if (priceDB.ValueIncVat> dailyAverage)
+                if (priceDB.ValueIncVat > dailyAverage)
                 {
                     doAction = true;
                 }
@@ -519,7 +522,7 @@ namespace EnergyIOT
 
 
 
-//-----------------------Getting one or several prices---------------------
+        //-----------------------Getting one or several prices---------------------
 
 
         /// <summary>
@@ -540,23 +543,44 @@ namespace EnergyIOT
         }
 
         /// <summary>
-        /// Gets the daily prices
+        /// Gets the daily prices - but for price session e.g. 22:00-22:00 UTC
         /// </summary>
         /// <param name="dataStore">IMplementation of IDataStore - Database etc store</param>
         public async Task<List<EnergyPrice>> Trigger_GetDaysPrices(IDataStore dataSource)
         {
-            List<EnergyPrice> energyPricesDB = [];
 
-            DateTime dateFrom = new(DateOnly.FromDateTime(DateTime.Now), new TimeOnly(0, 0, 0));
+            if (energyDailyPricesDB.Count > 0)
+                return energyDailyPricesDB;
 
-            DateTime dateTo = new(DateOnly.FromDateTime(DateTime.Now.AddDays(1)), new TimeOnly(0, 0, 0));
+            DateTime dateFrom = new(DateOnly.FromDateTime(DateTime.Now.AddDays(-1)), new TimeOnly(DateParameterHour(), 0, 0));
 
-            energyPricesDB = await dataSource.GetDateSpanPrices(dateFrom, dateTo);
+            DateTime dateTo = new(DateOnly.FromDateTime(DateTime.Now), new TimeOnly(DateParameterHour(), 30, 0));
 
-            return energyPricesDB;
+            energyDailyPricesDB = await dataSource.GetDateSpanPrices(dateFrom, dateTo);
+
+            return energyDailyPricesDB;
 
         }
 
+
+        int DateParameterHour()
+        {
+            //End hour is UK 23 - but BST/GMT changes.
+            //Get UTC of current version
+            if (utcEndHour == 0)
+            {
+                //Get hour to - varies with BST/GMT
+                DateTime ukEnd = new(DateOnly.FromDateTime(DateTime.Now), new TimeOnly(23, 0, 0));
+                DateTime utcEnd = ukEnd.ToUniversalTime();
+                utcEndHour = utcEnd.Hour;
+                return utcEndHour;
+            }
+            else
+            {
+                return utcEndHour;
+            }
+
+        }
 
         /// <summary>
         /// Calculate grouped pricing averages, return orderd list lowest to higher group by no : noSections
@@ -640,7 +664,7 @@ namespace EnergyIOT
 
 
 
-// --------------- Logging + Failures-----------
+        // --------------- Logging + Failures-----------
 
         private void LogTriggerCall(string triggerFunction, Trigger triggerItem)
         {
@@ -680,7 +704,7 @@ namespace EnergyIOT
             }
 
 
-            SendEmail.SendEmailMsg( _emailConfig, _logger, subject, message);
+            SendEmail.SendEmailMsg(_emailConfig, _logger, subject, message);
         }
 
     }//Class TriggerManager
