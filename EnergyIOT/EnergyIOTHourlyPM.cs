@@ -92,7 +92,7 @@ namespace EnergyIOT
 
             if (myTimer.ScheduleStatus is not null)
             {
-                _logger.LogInformation("Next timer schedule at: {NextTime}", myTimer.ScheduleStatus.Next);
+                _logger.LogInformation("EnergyIOTHourlyPM: Next timer schedule at: {NextTime}", myTimer.ScheduleStatus.Next);
             }
 
         }
