@@ -14,7 +14,7 @@ namespace EnergyIOT
         private EmailConfig _emailConfig;
 
         [Function("EnergyIOTMonthly")]
-        public void Run([TimerTrigger("15 0 1,15 * *")] TimerInfo myTimer)
+        public void Run([TimerTrigger("0 15 0 1,15 * *")] TimerInfo myTimer)
         {
             _logger.LogInformation("C# Timer trigger function EnergyIOTMonthly executed at: {}", DateTime.Now);
 
