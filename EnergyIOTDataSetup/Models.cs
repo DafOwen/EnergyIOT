@@ -81,6 +81,8 @@ namespace EnergyIOTDataSetup
 
         //use function/host setting public string logging { get; set; }
         public List<Action> Actions { get; set; }
+
+        public List<ModesItem> Modes { get; set; }
     }
 
     internal class TriggerImport
@@ -90,11 +92,12 @@ namespace EnergyIOTDataSetup
         public string Interval { get; set; }
         public string Type { get; set; }
         public int Order { get; set; }
-        public bool Active { get; set; }
         public decimal? Value { get; set; }
 
         //use function/host setting public string logging { get; set; }
         public List<int> ActionIDs { get; set; }
+
+        public List<ModesItem> Modes { get; set; }
     }
 
     internal class Action
@@ -128,6 +131,12 @@ namespace EnergyIOTDataSetup
         public string Message { get; set; }
     }
 
+    internal class ModesItem
+    {
+        public string Mode { get; set; }
+
+        public bool Action { get; set; }
+    }
 
     //---------------------------KASA------------------------------
 

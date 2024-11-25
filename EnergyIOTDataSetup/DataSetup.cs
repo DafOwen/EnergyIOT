@@ -102,8 +102,8 @@ namespace EnergyIOTDataSetup
                         Interval = importTrigger.Interval,
                         Type = importTrigger.Type,
                         Order = importTrigger.Order,
-                        Active = importTrigger.Active,
-                        Value = importTrigger.Value
+                        Value = importTrigger.Value,
+                        Modes = importTrigger.Modes
                     };
 
                     List<Action> actionsList = new();

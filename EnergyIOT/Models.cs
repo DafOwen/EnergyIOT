@@ -114,9 +114,10 @@ namespace EnergyIOT
         public string Interval { get; set; }
         public string Type { get; set; }
         public int Order { get; set; }
-        public bool Active { get; set; }
         public decimal? Value { get; set; }
         public List<Action> Actions { get; set; }
+
+        public List<ModesItem> Modes { get; set; }
     }
 
     internal class Action
@@ -130,6 +131,12 @@ namespace EnergyIOT
         public int StateTo {get; set; }
     }
 
+    internal class ModesItem
+    {
+        public string Mode { get; set; }
+
+        public bool Action { get; set; }
+    }
     internal class ActionGroup
     {
         public string id { get; set; }

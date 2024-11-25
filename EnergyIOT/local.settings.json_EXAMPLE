@@ -8,7 +8,7 @@
     //Variables to be entered in Azure Functions Appliction Settings
     "EnergyAPI_BaseURI": "https://api.octopus.energy",
     "EnergyAPI_Section": "/v1/products/",
-    "EnergyAPI_Product": "AGILE-23-12-06", 
+    "EnergyAPI_Product": "AGILE-23-12-06",
     "EnergyAPI_SubSection": "/electricity-tariffs/",
     "EnergyAPI_TariffCode": "E-1R-AGILE-23-12-06-C",
     "EnergyAPI_EndSection": "/standard-unit-rates/",
@@ -45,6 +45,7 @@
     "PriceColour_15.0001:20": "#FFD339",
     "PriceColour_20.0001:25": "#FFA239",
     "PriceColour_25.0001:30": "#FF7F39",
-    "PriceColour_30.0001:9999": "#FF5939"
+    "PriceColour_30.0001:9999": "#FF5939",
+    "EnergyIOTMode": "Default"
   }
 }

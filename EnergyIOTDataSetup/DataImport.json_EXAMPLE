@@ -6,9 +6,14 @@
       "Interval": "PerPrice",
       "Type": "Price_Above",
       "Order": 1,
-      "Active": false,
       "Value": 14,
-      "ActionIDs": [ 3, 4 ]
+      "ActionIDs": [ 3, 4 ],
+      "Modes": [
+        {
+          "Mode": "Default",
+          "Active": false
+        }
+      ]
     },
     {
       "id": "2",
@@ -16,9 +21,14 @@
       "Interval": "PerPrice",
       "Type": "Section_Low",
       "Order": 2,
-      "Active": true,
       "Value": 4,
-      "ActionIDs": [ 1, 2 ]
+      "ActionIDs": [ 1, 2 ],
+      "Modes": [
+        {
+          "Mode": "Default",
+          "Active": true
+        }
+      ]
     },
     {
       "id": "3",
@@ -26,9 +36,18 @@
       "Interval": "PerPrice",
       "Type": "Price_Below",
       "Order": 3,
-      "Active": true,
       "Value": 0,
-      "ActionIDs": [ 1, 2 ]
+      "ActionIDs": [ 1, 2 ],
+      "Modes": [
+        {
+          "Mode": "Default",
+          "Active": true
+        },
+        {
+          "Mode": "Away",
+          "Active": true
+        }
+      ]
     },
     {
       "id": "4",
@@ -36,9 +55,14 @@
       "Interval": "PerPrice",
       "Type": "Price_Below",
       "Order": 4,
-      "Active": false,
       "Value": 13,
-      "ActionIDs": [ 1, 2 ]
+      "ActionIDs": [ 1, 2 ],
+      "Modes": [
+        {
+          "Mode": "Default",
+          "Active": false
+        }
+      ]
     },
     {
       "id": "5",
@@ -46,9 +70,14 @@
       "Interval": "PerPrice",
       "Type": "Average_Above",
       "Order": 5,
-      "Active": true,
       "Value": null,
-      "ActionIDs": [ 3, 4 ]
+      "ActionIDs": [ 3, 4 ],
+      "Modes": [
+        {
+          "Mode": "Default",
+          "Active": true
+        }
+      ]
     },
     {
       "id": "6",
@@ -56,36 +85,56 @@
       "Interval": "PerPrice",
       "Type": "Average_Below",
       "Order": 6,
-      "Active": false,
       "Value": null,
-      "ActionIDs": [ 1, 2 ]
+      "ActionIDs": [ 1, 2 ],
+      "Modes": [
+        {
+          "Mode": "Default",
+          "Active": false
+        }
+      ]
     },
     {
       "id": "7",
+      "Name": "Above 0 pence",
+      "Interval": "PerPrice",
+      "Type": "Price_Above",
+      "Order": 7,
+      "Value": 0,
+      "ActionIDs": [ 3, 4 ],
+      "Modes": [
+        {
+          "Mode": "Away",
+          "Active": true
+        }
+      ]
+    },
+    {
+      "id": "8",
       "Name": "Hourly Notify Lowest 4 Section",
       "Interval": "Hourly",
       "Type": "Hourly_NotifyLowestSection",
-      "Order": 7,
+      "Order": 8,
       "Active": true,
       "Value": 4,
       "ActionIDs": [ 5 ]
     },
     {
-      "id": "8",
+      "id": "9",
       "Name": "Hourly Below Zero",
       "Interval": "Hourly",
       "Type": "Hourly_NotifyPricesBelowValue",
-      "Order": 8,
+      "Order": 9,
       "Active": true,
       "Value": 0,
       "ActionIDs": [ 5 ]
     },
     {
-      "id": "9",
+      "id": "10",
       "Name": "Hourly Notify Prices",
       "Interval": "Hourly",
       "Type": "Hourly_NotifyPricesList",
-      "Order": 9,
+      "Order": 10,
       "Active": true,
       "Value": 0,
       "ActionIDs": [ 5 ]

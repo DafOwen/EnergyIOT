@@ -135,7 +135,7 @@ namespace EnergyIOT
             return sortedTriggerList;
         }
 
-        public async Task<List<Trigger>> GetPerPriceTriggers()
+        public async Task<List<Trigger>> GetPerPriceTriggers(string mode)
         {
             CheckConfig();
 
@@ -149,7 +149,7 @@ namespace EnergyIOT
 
                 Microsoft.Azure.Cosmos.Container triggerContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.TriggerCollection, _databaseConfig.TriggerParition);
 
-                using FeedIterator<Trigger> triggerFeed = triggerContainer.GetItemQueryIterator<Trigger>(queryText: "select * from c WHERE c.Interval = 'PerPrice' AND c.Active = true ");
+                using FeedIterator<Trigger> triggerFeed = triggerContainer.GetItemQueryIterator<Trigger>(queryText: string.Format("select * from c WHERE c.Interval = 'PerPrice' AND ARRAY_CONTAINS(c.Modes, { 'Mode': '{0}', 'Active': true }, true) ",mode));
 
                 //triggerFeed.
                 List<Trigger> triggers = [];
@@ -366,5 +366,9 @@ namespace EnergyIOT
             }
 
         }
+
+        //TODO - modes
+        //select * from c WHERE c.Interval = 'PerPrice' AND c.Active = false AND ARRAY_CONTAINS(c.Modes, { "Mode": "Default", "Active": true }, true)
+
     }
 }

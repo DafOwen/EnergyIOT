@@ -48,8 +48,12 @@ namespace EnergyIOT
                 _emailConfig = emailConfig;
             }
 
-
-            List<Trigger> sortedTriggerList = await dataStore.GetPerPriceTriggers();
+            string mode = Environment.GetEnvironmentVariable("EnergyIOTMode");
+            if (string.IsNullOrEmpty(mode))
+            {
+                mode = "Default";
+            }
+            List<Trigger> sortedTriggerList = await dataStore.GetPerPriceTriggers(mode);
 
             //go through each - call trigger
             foreach (Trigger triggerItem in sortedTriggerList)
