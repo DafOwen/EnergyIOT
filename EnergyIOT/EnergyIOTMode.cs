@@ -14,11 +14,10 @@ namespace EnergyIOT
             _logger = logger;
         }
 
-        [Function("Function")]
+        [Function("EnergyIOTMode")]
         public IActionResult Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
         {
-            _logger.LogInformation("C# HTTP trigger function processed a request.");
-
+            _logger.LogInformation("C# HTTP trigger function EnergyIOTMode processed a request.");
 
             string currentMode = Environment.GetEnvironmentVariable("EnergyIOTMode");
             if (string.IsNullOrEmpty(currentMode))
@@ -31,7 +30,7 @@ namespace EnergyIOT
 
             if (string.IsNullOrEmpty(newMode))
             {
-                return new BadRequestObjectResult("mode Parameter empty");
+                return new BadRequestObjectResult("Mode Parameter empty");
 
             }
             else
@@ -41,12 +40,12 @@ namespace EnergyIOT
 
             if (newMode == currentMode)
             {
-                return new OkObjectResult("Mode already :" + currentMode);
+                return new OkObjectResult("Mode already: " + currentMode);
             }
 
             Environment.SetEnvironmentVariable("EnergyIOTMode", newMode);
 
-            return new OkObjectResult("Mode set to:" + newMode);
+            return new OkObjectResult("Mode changed to: " + newMode);
         }
     }
 }
