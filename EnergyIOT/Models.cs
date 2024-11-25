@@ -135,7 +135,7 @@ namespace EnergyIOT
     {
         public string Mode { get; set; }
 
-        public bool Action { get; set; }
+        public bool Active { get; set; }
     }
     internal class ActionGroup
     {

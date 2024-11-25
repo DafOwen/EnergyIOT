@@ -149,7 +149,7 @@ namespace EnergyIOT
 
                 Microsoft.Azure.Cosmos.Container triggerContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.TriggerCollection, _databaseConfig.TriggerParition);
 
-                using FeedIterator<Trigger> triggerFeed = triggerContainer.GetItemQueryIterator<Trigger>(queryText: string.Format("select * from c WHERE c.Interval = 'PerPrice' AND ARRAY_CONTAINS(c.Modes, { 'Mode': '{0}', 'Active': true }, true) ",mode));
+                using FeedIterator<Trigger> triggerFeed = triggerContainer.GetItemQueryIterator<Trigger>(queryText: string.Format("select * from c WHERE c.Interval = 'PerPrice' AND ARRAY_CONTAINS(c.Modes,{{'Mode': '{0}', 'Active': true}}, true) ",mode));
 
                 //triggerFeed.
                 List<Trigger> triggers = [];
