@@ -77,9 +77,7 @@ namespace EnergyIOT
                 //Convert to UTC
                 _startDateTimeUTC = _startDateTimeUTC.ToUniversalTime();
                 _startDateTimeStrUTC = _startDateTimeUTC.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'");
-
             }
-
 
             //interval prameter
             int intervalInt;
