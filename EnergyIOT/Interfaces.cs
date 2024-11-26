@@ -13,5 +13,7 @@
         Task SetActionGroupToken(string actionGroupID, string token);
         Task OverrideInsertUpdate(OverrideTrigger overrideItem);
         Task<OverrideTrigger> GetOverride(string idStartDate);
+        Task<DBConfigString> GetConfigString(string configName);
+        Task SetConfigString(DBConfigString configString);
     }
 }

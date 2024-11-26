@@ -19,11 +19,13 @@
     "Database_PriceCollection": "EnergyPrices",
     "Database_PricePartition": "/id",
     "Database_TriggerCollection": "Triggers",
-    "Database_TriggerParition": "/id",
+    "Database_TriggerPartition": "/id",
     "Database_ActionGroupCollection": "ActionGroup",
-    "Database_ActionGroupParition": "/id",
+    "Database_ActionGroupPartition": "/id",
     "Database_OverrideCollection": "Override",
-    "Database_OverrideParition": "/id",
+    "Database_OverridePartition": "/id",
+    "Database_ConfigCollection": "Config",
+    "Database_ConfigPartition": "/id",
     "Email_From": "???????????@????????.???",
     "Email_To": "???????????@????????.???",
     "Email_Server": "??????.??????.????",
@@ -45,7 +47,6 @@
     "PriceColour_15.0001:20": "#FFD339",
     "PriceColour_20.0001:25": "#FFA239",
     "PriceColour_25.0001:30": "#FF7F39",
-    "PriceColour_30.0001:9999": "#FF5939",
-    "EnergyIOTMode": "Default"
+    "PriceColour_30.0001:9999": "#FF5939"
   }
 }

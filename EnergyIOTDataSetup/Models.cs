@@ -16,11 +16,13 @@ namespace EnergyIOTDataSetup
         public string PriceCollection { get; set; }
         public string PricePartition { get; set; }
         public string TriggerCollection { get; set; }
-        public string TriggerParition { get; set; }
+        public string TriggerPartition { get; set; }
         public string ActionGroupCollection { get; set; }
-        public string ActionGroupParition { get; set; }
+        public string ActionGroupPartition { get; set; }
         public string OverrideCollection { get; set; }
-        public string OverrideParition { get; set; }
+        public string OverridePartition { get; set; }
+        public string ConfigCollection { get; set; }
+        public string ConfigPartition { get; set; }
 
     }
 
@@ -46,6 +48,16 @@ namespace EnergyIOTDataSetup
         public bool RefreshTokenNeeded { get; set; }
     }
 
+
+    //-----------------DB Config------------------------
+
+    internal class DBConfigString
+    {
+        public string id { get; set; }
+
+        public string Value { get; set; }
+
+    }
     //--------------------Overide-------------------------
 
     internal class OverrideTrigger
@@ -92,6 +104,7 @@ namespace EnergyIOTDataSetup
         public string Interval { get; set; }
         public string Type { get; set; }
         public int Order { get; set; }
+        public bool Active { get; set; }
         public decimal? Value { get; set; }
 
         //use function/host setting public string logging { get; set; }

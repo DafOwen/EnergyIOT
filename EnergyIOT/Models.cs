@@ -20,6 +20,8 @@ namespace EnergyIOT
         public string ActionGroupParition { get; set; }
         public string OverrideCollection { get; set; }
         public string OverrideParition { get; set; }
+        public string ConfigCollection { get; set; }
+        public string ConfigPartition { get; set; }
     }
 
     internal class EmailConfig
@@ -114,6 +116,7 @@ namespace EnergyIOT
         public string Interval { get; set; }
         public string Type { get; set; }
         public int Order { get; set; }
+        public bool Active { get; set; }
         public decimal? Value { get; set; }
         public List<Action> Actions { get; set; }
 
@@ -379,5 +382,17 @@ namespace EnergyIOT
         public decimal From { get; set; }
         public decimal To { get; set; }
         public string Colour { get; set; }
+    }
+
+
+
+    //-----------------DB Config------------------------
+
+    internal class DBConfigString
+    {
+        public string id { get; set; }
+
+        public string Value { get; set; }
+
     }
 }

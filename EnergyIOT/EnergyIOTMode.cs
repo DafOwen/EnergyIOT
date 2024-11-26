@@ -19,33 +19,53 @@ namespace EnergyIOT
         {
             _logger.LogInformation("C# HTTP trigger function EnergyIOTMode processed a request.");
 
-            string currentMode = Environment.GetEnvironmentVariable("EnergyIOTMode");
-            if (string.IsNullOrEmpty(currentMode))
-            {
-                currentMode = "Default";
-            }
-
-
             string? newMode = req.Query["mode"];
-
             if (string.IsNullOrEmpty(newMode))
             {
                 return new BadRequestObjectResult("Mode Parameter empty");
-
             }
             else
             {
                 newMode = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(newMode);
             }
 
-            if (newMode == currentMode)
+
+            //Get CONFIGURATION------------------
+            ConfigManagerFunction configManager;
+            DatabaseConfig databaseConfig;
+
+            try
             {
-                return new OkObjectResult("Mode already: " + currentMode);
+                configManager = new ConfigManagerFunction();
+                databaseConfig = configManager.GetDatabaseConfig();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Config Manager Failure {Type} msg: {Msg}", ex.GetType(), ex.Message);
+                return new NotFoundObjectResult($"Config Manager Failure {ex.GetType()} msg: {ex.Message}");
             }
 
-            Environment.SetEnvironmentVariable("EnergyIOTMode", newMode);
+            DataStoreCosmoDB cosmosDBDataStore = new();
+            cosmosDBDataStore.Config(databaseConfig);
 
-            return new OkObjectResult("Mode changed to: " + newMode);
+            DBConfigString configString = new()
+            {
+                Value = newMode,
+                id = "Mode"
+            };
+
+            try
+            {
+                cosmosDBDataStore.SetConfigString(configString);
+
+                return new OkObjectResult("Mode changed to: " + newMode);
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult("DB Config update error:" + ex.Message);
+            }
+
+
         }
     }
 }

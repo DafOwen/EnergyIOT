@@ -134,6 +134,12 @@ In addition to custom setting the following is used to run the Azure function on
 
 <br>
 
+
+### Database Config values
+TODO
+
+<br>
+
 ## Triggers and Actions
 
 The system is set up/worded in terms of triggers and actions.

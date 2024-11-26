@@ -6,6 +6,7 @@
       "Interval": "PerPrice",
       "Type": "Price_Above",
       "Order": 1,
+      "Active": true,
       "Value": 14,
       "ActionIDs": [ 3, 4 ],
       "Modes": [
@@ -21,6 +22,7 @@
       "Interval": "PerPrice",
       "Type": "Section_Low",
       "Order": 2,
+      "Active": true,
       "Value": 4,
       "ActionIDs": [ 1, 2 ],
       "Modes": [
@@ -36,6 +38,7 @@
       "Interval": "PerPrice",
       "Type": "Price_Below",
       "Order": 3,
+      "Active": true,
       "Value": 0,
       "ActionIDs": [ 1, 2 ],
       "Modes": [
@@ -55,6 +58,7 @@
       "Interval": "PerPrice",
       "Type": "Price_Below",
       "Order": 4,
+      "Active": true,
       "Value": 13,
       "ActionIDs": [ 1, 2 ],
       "Modes": [
@@ -70,6 +74,7 @@
       "Interval": "PerPrice",
       "Type": "Average_Above",
       "Order": 5,
+      "Active": true,
       "Value": null,
       "ActionIDs": [ 3, 4 ],
       "Modes": [
@@ -85,6 +90,7 @@
       "Interval": "PerPrice",
       "Type": "Average_Below",
       "Order": 6,
+      "Active": true,
       "Value": null,
       "ActionIDs": [ 1, 2 ],
       "Modes": [
@@ -100,6 +106,7 @@
       "Interval": "PerPrice",
       "Type": "Price_Above",
       "Order": 7,
+      "Active": true,
       "Value": 0,
       "ActionIDs": [ 3, 4 ],
       "Modes": [

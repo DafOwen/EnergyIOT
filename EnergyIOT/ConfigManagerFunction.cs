@@ -26,7 +26,9 @@ namespace EnergyIOT
                 ActionGroupCollection = GetEnvAriableStr("Database_ActionGroupCollection"),
                 ActionGroupParition = GetEnvAriableStr("Database_ActionGroupParition"),
                 OverrideCollection = GetEnvAriableStr("Database_OverrideCollection"),
-                OverrideParition = GetEnvAriableStr("Database_OverrideParition")
+                OverrideParition = GetEnvAriableStr("Database_OverrideParition"),
+                ConfigCollection = GetEnvAriableStr("Database_ConfigCollection"),
+                ConfigPartition = GetEnvAriableStr("Database_ConfigPartition")
             };
 
             ////Get EnergyAPIConfig
