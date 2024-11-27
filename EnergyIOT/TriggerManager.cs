@@ -22,7 +22,7 @@ namespace EnergyIOT
         /// <param name="energyAPIConfig">Config values for Energy API</param>
         /// <param name="httpClientFactory">IHttpClientFactory - client factory</param>
         /// <param name="emailConfig">Emailconfig settings</param>
-        internal async Task Trigger_PerPrice_Manager(IDataStore dataStore, IHttpClientFactory httpClientFactory, EmailConfig emailConfig)
+        internal async Task Trigger_PerPrice_Manager(IDataStore dataStore, IHttpClientFactory httpClientFactory, EmailConfig emailConfig, string mode)
         {
 
             _actionFailures = [];
@@ -48,8 +48,9 @@ namespace EnergyIOT
                 _emailConfig = emailConfig;
             }
 
+            List<Trigger> sortedTriggerList = await dataStore.GetPerPriceTriggers(mode);
 
-            List<Trigger> sortedTriggerList = await dataStore.GetPerPriceTriggers();
+            _logger.LogInformation("PerPrice Mode: {mode} Active triggers found :{count}", mode, sortedTriggerList.Count);
 
             //go through each - call trigger
             foreach (Trigger triggerItem in sortedTriggerList)
@@ -515,7 +516,7 @@ namespace EnergyIOT
             }
             else
             {
-                LogTriggerResult("Trigger_PerPrice_PriceAboveBelowValue", triggerItem, "Result Actions");
+                LogTriggerResult("Trigger_PerPrice_PriceAboveBelowValue", triggerItem, "Skip Actions");
             }
 
         }

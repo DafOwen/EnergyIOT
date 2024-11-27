@@ -7,11 +7,13 @@
     "PriceCollection": "EnergyPrices",
     "PricePartition": "/id",
     "TriggerCollection": "Triggers",
-    "TriggerParition": "/id",
+    "TriggerPartition": "/id",
     "ActionGroupCollection": "ActionGroup",
-    "ActionGroupParition": "/id",
+    "ActionGroupPartition": "/id",
     "OverrideCollection": "Override",
-    "OverrideParition": "/id"
+    "OverridePartition": "/id",
+    "ConfigCollection": "Config",
+    "ConfigPartition": "/id"
   },
 
   "EnergyAPI": {

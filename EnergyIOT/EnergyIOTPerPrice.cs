@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.Eventing.Reader;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -15,7 +16,7 @@ namespace EnergyIOT
         {
             _logger.LogInformation("C# Timer trigger function EnergyIOTPerPrice executed at: {Now}", DateTime.Now);
 
-#region GetConfiguration
+            #region GetConfiguration
             ConfigManagerFunction configManager;
 
             try
@@ -38,9 +39,9 @@ namespace EnergyIOT
                 return;
 
             }
-#endregion
+            #endregion
 
-#region IHttpClientFactory
+            #region IHttpClientFactory
             //Set up IHttpClientFactory ----------------------
 
             //Get HttpCLient for Injections
@@ -60,12 +61,12 @@ namespace EnergyIOT
             serviceProvider = serviceCollection.BuildServiceProvider();
             var httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
 
-#endregion
+            #endregion
 
-#region DataStore/DB
+            #region DataStore/DB
             DataStoreCosmoDB cosmosDBDataStore = new();
             cosmosDBDataStore.Config(databaseConfig);
-#endregion
+            #endregion
 
             //Check Override
             OverrideTrigger overrideTrigger = CheckForOverride(cosmosDBDataStore).GetAwaiter().GetResult();
@@ -76,9 +77,21 @@ namespace EnergyIOT
                 return;
             }
 
+            //Mode
+            string mode = "";
+            DBConfigString dbConfig = cosmosDBDataStore.GetConfigString("Mode").GetAwaiter().GetResult();
+            if (dbConfig != null)
+            {
+                mode = dbConfig.Value;
+            }
+            else
+            {
+                mode = "Default";
+            }
+
             //Call Trigger Manager
             TriggerManager triggerManager = new(_logger);
-            triggerManager.Trigger_PerPrice_Manager(cosmosDBDataStore, httpClientFactory, emailConfig).GetAwaiter().GetResult();
+            triggerManager.Trigger_PerPrice_Manager(cosmosDBDataStore, httpClientFactory, emailConfig, mode).GetAwaiter().GetResult();
 
 
             if (myTimer.ScheduleStatus is not null)

@@ -135,7 +135,7 @@ namespace EnergyIOT
             return sortedTriggerList;
         }
 
-        public async Task<List<Trigger>> GetPerPriceTriggers()
+        public async Task<List<Trigger>> GetPerPriceTriggers(string mode)
         {
             CheckConfig();
 
@@ -149,7 +149,7 @@ namespace EnergyIOT
 
                 Microsoft.Azure.Cosmos.Container triggerContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.TriggerCollection, _databaseConfig.TriggerParition);
 
-                using FeedIterator<Trigger> triggerFeed = triggerContainer.GetItemQueryIterator<Trigger>(queryText: "select * from c WHERE c.Interval = 'PerPrice' AND c.Active = true ");
+                using FeedIterator<Trigger> triggerFeed = triggerContainer.GetItemQueryIterator<Trigger>(queryText: string.Format("select * from c WHERE c.Interval = 'PerPrice' AND ARRAY_CONTAINS(c.Modes,{{'Mode': '{0}', 'Active': true}}, true) ", mode));
 
                 //triggerFeed.
                 List<Trigger> triggers = [];
@@ -366,5 +366,82 @@ namespace EnergyIOT
             }
 
         }
+
+        public async Task<DBConfigString> GetConfigString(string configName)
+        {
+            CheckConfig();
+
+            using (CosmosClient client = new(_databaseConfig.EndpointURI, _databaseConfig.PrimaryKey))
+            {
+                DatabaseResponse databaseResponse = await client.CreateDatabaseIfNotExistsAsync(_databaseConfig.DatabaseName);
+                Database targetDatabase = databaseResponse.Database;
+
+                Microsoft.Azure.Cosmos.Container configContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.ConfigCollection, _databaseConfig.ConfigPartition);
+
+                DBConfigString dbconfigString = new();
+
+                try
+                {
+                    var parameterizedQuery = new QueryDefinition(
+                    query: "SELECT * FROM cfg WHERE cfg.id = @configName"
+                )
+                    .WithParameter("@configName", configName);
+
+                    //overrideItem = await overrideContainer.ReadItemAsync<OverrideTrigger>(idStartDate, new PartitionKey(idStartDate));
+                    using FeedIterator<DBConfigString> filteredFeed = configContainer.GetItemQueryIterator<DBConfigString>(
+                        queryDefinition: parameterizedQuery
+                    );
+
+                    FeedResponse<DBConfigString> responseOne = await filteredFeed.ReadNextAsync();
+                    if (responseOne.StatusCode != HttpStatusCode.OK)
+                    {
+                        //not log here
+                        throw new Exception("COnfig DataStore call failed");
+                    }
+                    else
+                    {
+                        return responseOne.Resource.FirstOrDefault();
+                    }
+
+                }
+                catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+                {
+                    //no error log - might not exist
+                    return null;
+                }
+            }
+
+        }
+
+        public async Task SetConfigString(DBConfigString configString)
+        {
+            CheckConfig();
+
+            using CosmosClient client = new(_databaseConfig.EndpointURI, _databaseConfig.PrimaryKey);
+
+            //DB
+            DatabaseResponse databaseResponse = await client.CreateDatabaseIfNotExistsAsync(_databaseConfig.DatabaseName);
+            Database targetDatabase = databaseResponse.Database;
+
+            //Container
+            Microsoft.Azure.Cosmos.Container configContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.ConfigCollection, _databaseConfig.ConfigPartition);
+
+            PartitionKey partitionKey = new(_databaseConfig.ConfigPartition);
+
+            //Update ActionGroup
+            List<PatchOperation> operations =
+             [
+                PatchOperation.Replace("/Value", configString.Value)
+             ];
+
+            ItemResponse<ActionGroup> responseUpdate = await configContainer.PatchItemAsync<ActionGroup>(
+                id: configString.id,
+                new PartitionKey(configString.id),
+                patchOperations: operations
+            );
+
+            return;
+        }
+
     }
 }
