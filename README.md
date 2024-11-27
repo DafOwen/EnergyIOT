@@ -3,6 +3,12 @@
 Octopus Energy + (TP-Link Kasa) Smart Switch API
 Built as a replacement to IFTTT which I wasn't very happy with.
 
+### Updates
+| Date | Description |
+| :---: | :---: |
+| 2024-11-27 | Modes : Introducing modes where Triggers can be assigned a mode where they work e.g. only >0 or <0 price |
+
+
 ### EnergyIOT
 
 Main project of the solution - Azure function app with four functions
@@ -45,7 +51,11 @@ Initially had it as [00 0 1 * *] - midnight on the 1st of the month, but discove
 __EnergyIOTOverride__ 
 
 
-Http Trigger: To insert an "Override" which stops the On/Off triggers from running for a while. Useful to keep the sockets on if needed during higher prices.
+Http Trigger: To insert an "Override" which stops the On/Off triggers from running for a set interval or time. Useful to keep the sockets on if needed during higher prices.
+
+__EnergyIOTMode__
+
+Http Trigger: To set the mode - enable/disable some triggers, currently: Default, Away or Off. Useful for longer term than an Override.
 
 <br>
 
@@ -136,7 +146,8 @@ In addition to custom setting the following is used to run the Azure function on
 
 
 ### Database Config values
-TODO
+2024-11-27 Update : 
+A new database collection to save config values. This was introduced for Modes so that they can be updated via Http Funcation. Environmental variables are not suited to such updates.
 
 <br>
 
@@ -173,12 +184,30 @@ Unlike IFTTT - they are not set for a specific timespan.
 To allow access to the HTTP trigger - be sure to add your IP address to the allow lis (or allow all).
 Mainly: Azure Home -> Function App -> Scroll down to Setting: Netowrking -> Add your home IP address
 
-The Funtion code is set for "AuthorizationLevel.Function" access level i,e, it needs a Function or higher access key to be called.
-To get the Function Key :
+The Funtion code is set for "AuthorizationLevel.Function" access level i.e. it needs a Function or higher access key to be called.
+To get the Function Key, e.g.:
 Azure Home -> Function App -> Function (EnergyIOTOverride) -> Developer -> Function Keys
 
+There are two Http Triggers
+
+### EnergyIOTMode
+
+The pattern to calling ths Http Trigger is:
+https://__[APP_NAME]__.azurewebsites.net/api/__EnergyIOTMode__?mode=__[MODE]__
+
+Current modes:
+
+__Default__: Standard PerPrice triggers
+
+__Away__: Only >0 or <0 PerPrice triggers - intended to just charge powerbanks etc when price is below 0p
+
+__Off__: Not assigned to any triggers, but intended to switch off triggers - a longer term solution than adding a long term Override
+
+
+### EnergyIOTOverride
+
 The pattern to calling the Http Trigger is:
-https://__[APP_NAME]__.azurewebsites.net/api/__[FUNCTION_NAME]__?code=__[APP_KEY]__&start=__[NOW OR DATE-TIME]__&interval=__[NUMBER]__
+https://__[APP_NAME]__.azurewebsites.net/api/__EnergyIOTOverride__?code=__[APP_KEY]__&start=__[NOW OR DATE-TIME]__&interval=__[NUMBER]__
 
 Where : __<NOW OR DATE-TIME>__
 is either just "Now" (without quotes)
