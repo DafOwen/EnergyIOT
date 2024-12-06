@@ -1,7 +1,8 @@
 ﻿using Microsoft.Azure.Cosmos;
 using System.Net;
+using EnergyIOT.Models;
 
-namespace EnergyIOT
+namespace EnergyIOT.DataAccess
 {
     internal class DataStoreCosmoDB : IDataStore
     {
@@ -23,7 +24,7 @@ namespace EnergyIOT
             Database targetDatabase = databaseResponse.Database;
 
             //Container
-            Microsoft.Azure.Cosmos.Container priceContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.PriceCollection, _databaseConfig.PricePartition);
+            Container priceContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.PriceCollection, _databaseConfig.PricePartition);
 
             //read item to see if exist
             EnergyPrice testPrice = new();
@@ -51,7 +52,7 @@ namespace EnergyIOT
             CheckConfig();
 
             //CosmoDB RU counters to avoid maxing it
-            Int32 costTotal = 0;
+            int costTotal = 0;
             DateTime? countTimer = null, startTimer = null;
 
             using CosmosClient client = new(_databaseConfig.EndpointURI, _databaseConfig.PrimaryKey);
@@ -61,7 +62,7 @@ namespace EnergyIOT
             Database targetDatabase = databaseResponse.Database;
 
             //Container
-            Microsoft.Azure.Cosmos.Container priceContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.PriceCollection, _databaseConfig.PricePartition);
+            Container priceContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.PriceCollection, _databaseConfig.PricePartition);
 
             //Db unit Prices
             if (startTimer == null)
@@ -77,7 +78,7 @@ namespace EnergyIOT
                 }
                 catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
                 {
-                    ItemResponse<EnergyPrice> unitPriceResponse = await priceContainer.CreateItemAsync<EnergyPrice>(priceItem, new PartitionKey(priceItem.id));
+                    ItemResponse<EnergyPrice> unitPriceResponse = await priceContainer.CreateItemAsync(priceItem, new PartitionKey(priceItem.id));
 
                     costTotal += (int)unitPriceResponse.RequestCharge;
                 }
@@ -110,7 +111,7 @@ namespace EnergyIOT
                 DatabaseResponse databaseResponse = await client.CreateDatabaseIfNotExistsAsync(_databaseConfig.DatabaseName);
                 Database targetDatabase = databaseResponse.Database;
 
-                Microsoft.Azure.Cosmos.Container triggerContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.TriggerCollection, _databaseConfig.TriggerParition);
+                Container triggerContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.TriggerCollection, _databaseConfig.TriggerParition);
 
                 using FeedIterator<Trigger> triggerFeed = triggerContainer.GetItemQueryIterator<Trigger>(queryText: "select * from c WHERE c.Interval = 'Hourly' AND c.Active = true ");
 
@@ -147,7 +148,7 @@ namespace EnergyIOT
                 DatabaseResponse databaseResponse = await client.CreateDatabaseIfNotExistsAsync(_databaseConfig.DatabaseName);
                 Database targetDatabase = databaseResponse.Database;
 
-                Microsoft.Azure.Cosmos.Container triggerContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.TriggerCollection, _databaseConfig.TriggerParition);
+                Container triggerContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.TriggerCollection, _databaseConfig.TriggerParition);
 
                 using FeedIterator<Trigger> triggerFeed = triggerContainer.GetItemQueryIterator<Trigger>(queryText: string.Format("select * from c WHERE c.Interval = 'PerPrice' AND ARRAY_CONTAINS(c.Modes,{{'Mode': '{0}', 'Active': true}}, true) ", mode));
 
@@ -183,7 +184,7 @@ namespace EnergyIOT
                 Database targetDatabase = databaseResponse.Database;
 
                 //Container
-                Microsoft.Azure.Cosmos.Container priceContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.PriceCollection, _databaseConfig.PricePartition);
+                Container priceContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.PriceCollection, _databaseConfig.PricePartition);
 
                 QueryDefinition queryDefinition = new QueryDefinition(
                     "select * from c where c.id >= @dateFrom and c.ValidTo <= @dateTo ")
@@ -215,7 +216,7 @@ namespace EnergyIOT
                 Database targetDatabase = databaseResponse.Database;
 
                 //Container
-                Microsoft.Azure.Cosmos.Container actionGroupContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.ActionGroupCollection, _databaseConfig.ActionGroupParition);
+                Container actionGroupContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.ActionGroupCollection, _databaseConfig.ActionGroupParition);
                 PartitionKey partitionKey = new(_databaseConfig.ActionGroupParition);
 
                 //list of Tuples
@@ -248,7 +249,7 @@ namespace EnergyIOT
             Database targetDatabase = databaseResponse.Database;
 
             //Container
-            Microsoft.Azure.Cosmos.Container actionGroupContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.ActionGroupCollection, _databaseConfig.ActionGroupParition);
+            Container actionGroupContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.ActionGroupCollection, _databaseConfig.ActionGroupParition);
             PartitionKey partitionKey = new(_databaseConfig.ActionGroupParition);
 
             try
@@ -272,7 +273,7 @@ namespace EnergyIOT
             Database targetDatabase = databaseResponse.Database;
 
             //Container
-            Microsoft.Azure.Cosmos.Container actionGroupContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.ActionGroupCollection, _databaseConfig.ActionGroupParition);
+            Container actionGroupContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.ActionGroupCollection, _databaseConfig.ActionGroupParition);
             PartitionKey partitionKey = new(_databaseConfig.ActionGroupParition);
 
             //Update ActionGroup
@@ -307,18 +308,18 @@ namespace EnergyIOT
             Database targetDatabase = databaseResponse.Database;
 
             //Container
-            Microsoft.Azure.Cosmos.Container overrideContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.OverrideCollection, _databaseConfig.OverrideParition);
+            Container overrideContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.OverrideCollection, _databaseConfig.OverrideParition);
 
             try
             {
                 ItemResponse<OverrideTrigger> unitPriceResponse = await overrideContainer.ReadItemAsync<OverrideTrigger>(overrideItem.id, new PartitionKey(overrideItem.id));
                 //replace
-                await overrideContainer.UpsertItemAsync<OverrideTrigger>(overrideItem);
+                await overrideContainer.UpsertItemAsync(overrideItem);
 
             }
             catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
-                ItemResponse<OverrideTrigger> unitPriceResponse = await overrideContainer.CreateItemAsync<OverrideTrigger>(overrideItem, new PartitionKey(overrideItem.id));
+                ItemResponse<OverrideTrigger> unitPriceResponse = await overrideContainer.CreateItemAsync(overrideItem, new PartitionKey(overrideItem.id));
             }
         }
 
@@ -331,7 +332,7 @@ namespace EnergyIOT
             Database targetDatabase = databaseResponse.Database;
 
             //Container
-            Microsoft.Azure.Cosmos.Container overrideContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.OverrideCollection, _databaseConfig.OverrideParition);
+            Container overrideContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.OverrideCollection, _databaseConfig.OverrideParition);
 
             OverrideTrigger overrideItem = new();
 
@@ -376,7 +377,7 @@ namespace EnergyIOT
                 DatabaseResponse databaseResponse = await client.CreateDatabaseIfNotExistsAsync(_databaseConfig.DatabaseName);
                 Database targetDatabase = databaseResponse.Database;
 
-                Microsoft.Azure.Cosmos.Container configContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.ConfigCollection, _databaseConfig.ConfigPartition);
+                Container configContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.ConfigCollection, _databaseConfig.ConfigPartition);
 
                 DBConfigString dbconfigString = new();
 
@@ -424,7 +425,7 @@ namespace EnergyIOT
             Database targetDatabase = databaseResponse.Database;
 
             //Container
-            Microsoft.Azure.Cosmos.Container configContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.ConfigCollection, _databaseConfig.ConfigPartition);
+            Container configContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.ConfigCollection, _databaseConfig.ConfigPartition);
 
             PartitionKey partitionKey = new(_databaseConfig.ConfigPartition);
 

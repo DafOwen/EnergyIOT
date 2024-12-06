@@ -1,6 +1,7 @@
 ﻿using System.Net.Mail;
 using System.Net;
 using Microsoft.Extensions.Logging;
+using EnergyIOT.Models;
 
 namespace EnergyIOT
 {

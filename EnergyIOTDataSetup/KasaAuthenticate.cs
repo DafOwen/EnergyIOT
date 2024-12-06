@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Net;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Azure.Cosmos;
+using EnergyIOTDataSetup.Models;
 
 namespace EnergyIOTDataSetup
 {

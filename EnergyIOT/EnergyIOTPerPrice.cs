@@ -1,8 +1,8 @@
-using System;
-using System.Diagnostics.Eventing.Reader;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using EnergyIOT.Models;
+using EnergyIOT.DataAccess;
 
 namespace EnergyIOT
 {

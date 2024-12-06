@@ -4,6 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json;
 using System.Text;
 using System.Net;
+using EnergyIOT.Models;
+using EnergyIOT.DataAccess;
 
 namespace EnergyIOT
 {

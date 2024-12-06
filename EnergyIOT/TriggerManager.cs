@@ -1,5 +1,7 @@
 ﻿using System.Globalization;
 using Microsoft.Extensions.Logging;
+using EnergyIOT.Models;
+using EnergyIOT.DataAccess;
 
 namespace EnergyIOT
 {

@@ -1,4 +1,6 @@
-﻿namespace EnergyIOT
+﻿using EnergyIOT.Models;
+
+namespace EnergyIOT.DataAccess
 {
     internal interface IDataStore
     {

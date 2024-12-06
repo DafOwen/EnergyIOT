@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Azure.Cosmos;
 using System.Configuration;
+using EnergyIOTDataSetup.Models;
+using Action = EnergyIOTDataSetup.Models.Action;
 
 namespace EnergyIOTDataSetup
 {

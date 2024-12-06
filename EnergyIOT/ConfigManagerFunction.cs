@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using EnergyIOT.Models;
 
 namespace EnergyIOT
 {
