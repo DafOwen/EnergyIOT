@@ -5,7 +5,7 @@
 
 namespace EnergyIOT.Models;
 
-internal class Trigger
+public class Trigger
 {
     public string id { get; set; }
     public string Name { get; set; }
@@ -19,7 +19,7 @@ internal class Trigger
     public List<ModesItem> Modes { get; set; }
 }
 
-internal class Action
+public class Action
 {
     public string ItemId { get; set; }
     public string GroupName { get; set; }
@@ -30,13 +30,13 @@ internal class Action
     public int StateTo { get; set; }
 }
 
-internal class ModesItem
+public class ModesItem
 {
     public string Mode { get; set; }
 
     public bool Active { get; set; }
 }
-internal class ActionGroup
+public class ActionGroup
 {
     public string id { get; set; }
     public string GroupName { get; set; }
@@ -47,7 +47,7 @@ internal class ActionGroup
     public DateTime LastUpdated { get; set; }
 }
 
-internal class ActionFailure
+public class ActionFailure
 {
     public string ItemId { get; set; }
     public string ItemName { get; set; }
@@ -59,7 +59,7 @@ internal class ActionFailure
 
 //--------------------Overide-------------------------
 
-internal class OverrideTrigger
+public class OverrideTrigger
 {
     //id = startdate/time in UTC
     public string id { get; set; }

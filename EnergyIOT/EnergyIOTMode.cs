@@ -10,10 +10,12 @@ namespace EnergyIOT
     public class EnergyIOTMode
     {
         private readonly ILogger<EnergyIOTMode> _logger;
+        private readonly IDataStore _dataStore;
 
-        public EnergyIOTMode(ILogger<EnergyIOTMode> logger)
+        public EnergyIOTMode(ILogger<EnergyIOTMode> logger, IDataStore dataStore)
         {
             _logger = logger;
+            _dataStore = dataStore;
         }
 
         [Function("EnergyIOTMode")]
@@ -47,8 +49,7 @@ namespace EnergyIOT
                 return new NotFoundObjectResult($"Config Manager Failure {ex.GetType()} msg: {ex.Message}");
             }
 
-            DataStoreCosmoDB cosmosDBDataStore = new();
-            cosmosDBDataStore.Config(databaseConfig);
+            _dataStore.Config(databaseConfig);
 
             DBConfigString configString = new()
             {
@@ -58,7 +59,7 @@ namespace EnergyIOT
 
             try
             {
-                cosmosDBDataStore.SetConfigString(configString);
+                _dataStore.SetConfigString(configString);
 
                 return new OkObjectResult("Mode changed to: " + newMode);
             }

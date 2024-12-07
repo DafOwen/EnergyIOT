@@ -2,7 +2,7 @@
 
 namespace EnergyIOT.DataAccess
 {
-    internal interface IDataStore
+    public interface IDataStore
     {
         void Config(DatabaseConfig dbConfig);
         Task<EnergyPrice> GetPriceItemByDate(DateTime dateToCheckUTC);

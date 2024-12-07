@@ -2,8 +2,7 @@
 
 namespace EnergyIOT.Models;
 
-
-internal class EnergyPrice
+public class EnergyPrice
 {
 
     [JsonPropertyName("valid_from")]
@@ -20,7 +19,7 @@ internal class EnergyPrice
 }
 
 
-internal class UnitRates
+public class UnitRates
 {
     [JsonPropertyName("count")]
     public int Count { get; set; }

@@ -5,7 +5,7 @@ using EnergyIOT.DataAccess;
 
 namespace EnergyIOT
 {
-    internal class TriggerManager(ILogger logger)
+    internal class TriggerManager(ILogger logger, IDataStore dataStore)
     {
         private IHttpClientFactory _httpClientFactory;
         private readonly ILogger _logger = logger;
@@ -20,11 +20,10 @@ namespace EnergyIOT
         /// <summary>
         /// Price Manager - Fetch then call the per price (30min) Triggers
         /// </summary>
-        /// <param name="dataStore">IMplementation of IDataStore - Database etc store</param>
         /// <param name="energyAPIConfig">Config values for Energy API</param>
         /// <param name="httpClientFactory">IHttpClientFactory - client factory</param>
         /// <param name="emailConfig">Emailconfig settings</param>
-        internal async Task Trigger_PerPrice_Manager(IDataStore dataStore, IHttpClientFactory httpClientFactory, EmailConfig emailConfig, string mode)
+        internal async Task Trigger_PerPrice_Manager(IHttpClientFactory httpClientFactory, EmailConfig emailConfig, string mode)
         {
 
             _actionFailures = [];
@@ -62,23 +61,23 @@ namespace EnergyIOT
                 {
 
                     case "Price_Above":
-                        Trigger_PerPrice_PriceAboveBelowValue(dataStore, triggerItem).GetAwaiter().GetResult();
+                        Trigger_PerPrice_PriceAboveBelowValue(triggerItem).GetAwaiter().GetResult();
                         break;
 
                     case "Section_Low":
-                        Trigger_PerPrice_SectionLow(dataStore, triggerItem).GetAwaiter().GetResult();
+                        Trigger_PerPrice_SectionLow(triggerItem).GetAwaiter().GetResult();
                         break;
 
                     case "Price_Below":
-                        Trigger_PerPrice_PriceAboveBelowValue(dataStore, triggerItem).GetAwaiter().GetResult();
+                        Trigger_PerPrice_PriceAboveBelowValue(triggerItem).GetAwaiter().GetResult();
                         break;
 
                     case "Average_Above":
-                        Trigger_PerPrice_AverageAboveBelow(dataStore, triggerItem).GetAwaiter().GetResult();
+                        Trigger_PerPrice_AverageAboveBelow(triggerItem).GetAwaiter().GetResult();
                         break;
 
                     case "Average_Below":
-                        Trigger_PerPrice_AverageAboveBelow(dataStore, triggerItem).GetAwaiter().GetResult();
+                        Trigger_PerPrice_AverageAboveBelow(triggerItem).GetAwaiter().GetResult();
                         break;
                 }
             }
@@ -98,12 +97,11 @@ namespace EnergyIOT
         /// <summary>
         /// Fetch then call the Hourly (~4-11) Triggers
         /// </summary>
-        /// <param name="dataStore">IMplementation of IDataStore - Database etc store</param>
         /// <param name="energyAPIConfig">Config values for Energy API</param>
         /// <param name="emailConfig">Emailconfig settings</param>
         /// <param name="unitRates">Energy unit rates</param>
         /// <param name="priceListColours">List of PriceListColour for colour coding in email</param>
-        internal async Task Trigger_Hourly_Manager(IDataStore dataStore, EmailConfig emailConfig, UnitRates unitRates, List<PriceListColour> priceListColours)
+        internal async Task Trigger_Hourly_Manager(EmailConfig emailConfig, UnitRates unitRates, List<PriceListColour> priceListColours)
         {
             _actionFailures = [];
 
@@ -335,7 +333,7 @@ namespace EnergyIOT
         /// </summary>
         /// <param name="dataStore">IMplementation of IDataStore - Database etc store</param>
         /// <param name="triggerItem">The trigger </param>
-        public async Task Trigger_PerPrice_PriceAboveBelowValue(IDataStore dataStore, Trigger triggerItem)
+        public async Task Trigger_PerPrice_PriceAboveBelowValue(Trigger triggerItem)
         {
             LogTriggerCall("Trigger_PerPrice_PriceAboveBelowValue", triggerItem);
 
@@ -377,8 +375,8 @@ namespace EnergyIOT
             if (doActions)
             {
                 LogTriggerResult("Trigger_PerPrice_PriceAboveBelowValue", triggerItem, "Fire Actions");
-                ActionManager actionManager = new(_logger);
-                List<ActionFailure> actionFailures = await actionManager.RunActions(dataStore, triggerItem, _httpClientFactory);
+                ActionManager actionManager = new(_logger, dataStore);
+                List<ActionFailure> actionFailures = await actionManager.RunActions(triggerItem, _httpClientFactory);
 
                 if (actionFailures?.Count > 0)
                 {
@@ -399,7 +397,7 @@ namespace EnergyIOT
         /// </summary>
         /// <param name="dataStore">IMplementation of IDataStore - Database etc store</param>
         /// <param name="triggerItem">The trigger </param>
-        public async Task Trigger_PerPrice_SectionLow(IDataStore dataStore, Trigger triggerItem)
+        public async Task Trigger_PerPrice_SectionLow(Trigger triggerItem)
         {
             LogTriggerCall("Trigger_PerPrice_SectionLow", triggerItem);
 
@@ -412,7 +410,7 @@ namespace EnergyIOT
             }
 
             //Get day's prices
-            List<EnergyPrice> dayEnergyPrices = await Trigger_GetDaysPrices(dataStore);
+            List<EnergyPrice> dayEnergyPrices = await Trigger_GetDaysPrices();
 
             if (dayEnergyPrices.Count == 0)
             {
@@ -438,8 +436,8 @@ namespace EnergyIOT
             //Do actions
             if (doAction)
             {
-                ActionManager actionManager = new(_logger);
-                List<ActionFailure> actionFailures = await actionManager.RunActions(dataStore, triggerItem, _httpClientFactory);
+                ActionManager actionManager = new(_logger, dataStore);
+                List<ActionFailure> actionFailures = await actionManager.RunActions(triggerItem, _httpClientFactory);
                 LogTriggerResult("Trigger_PerPrice_PriceAboveBelowValue", triggerItem, "Fire Actions");
 
                 if (actionFailures?.Count > 0)
@@ -461,13 +459,13 @@ namespace EnergyIOT
         /// </summary>
         /// <param name="dataStore">IMplementation of IDataStore - Database etc store</param>
         /// <param name="triggerItem">The trigger </param>
-        public async Task Trigger_PerPrice_AverageAboveBelow(IDataStore dataStore, Trigger triggerItem)
+        public async Task Trigger_PerPrice_AverageAboveBelow(Trigger triggerItem)
         {
 
             LogTriggerCall("Trigger_PerPrice_AverageAboveBelow", triggerItem);
 
             //Get average Price
-            decimal dailyAverage = await Trigger_GetDailyAverage(dataStore);
+            decimal dailyAverage = await Trigger_GetDailyAverage();
 
             bool doAction = false;
 
@@ -479,7 +477,7 @@ namespace EnergyIOT
             }
 
             // Get current price
-            EnergyPrice priceDB = await Trigger_PerPrice_GetPrice(dataStore);
+            EnergyPrice priceDB = await Trigger_PerPrice_GetPrice();
             if (priceDB == null)
             {
                 _logger.LogError("Trigger_PerPrice_PriceAboveBelowValue - Trigger_PerPrice_GetPrice NO prices");
@@ -507,8 +505,8 @@ namespace EnergyIOT
             //Do actions
             if (doAction)
             {
-                ActionManager actionManager = new(_logger);
-                List<ActionFailure> actionFailures = await actionManager.RunActions(dataStore, triggerItem, _httpClientFactory);
+                ActionManager actionManager = new(_logger, dataStore);
+                List<ActionFailure> actionFailures = await actionManager.RunActions(triggerItem, _httpClientFactory);
                 LogTriggerResult("Trigger_PerPrice_PriceAboveBelowValue", triggerItem, "Fire Actions");
 
                 if (actionFailures?.Count > 0)
@@ -532,7 +530,7 @@ namespace EnergyIOT
         /// Gets single (current) price
         /// </summary>
         /// <param name="dataStore">IMplementation of IDataStore - Database etc store</param>
-        public async Task<EnergyPrice> Trigger_PerPrice_GetPrice(IDataStore dataStore)
+        public async Task<EnergyPrice> Trigger_PerPrice_GetPrice()
         {
 
             EnergyPrice priceItemDB = new();
@@ -549,7 +547,7 @@ namespace EnergyIOT
         /// Gets the daily prices - but for price session e.g. 22:00-22:00 UTC
         /// </summary>
         /// <param name="dataStore">IMplementation of IDataStore - Database etc store</param>
-        public async Task<List<EnergyPrice>> Trigger_GetDaysPrices(IDataStore dataSource)
+        public async Task<List<EnergyPrice>> Trigger_GetDaysPrices()
         {
 
             if (energyDailyPricesDB.Count > 0)
@@ -559,7 +557,7 @@ namespace EnergyIOT
 
             DateTime dateTo = new(DateOnly.FromDateTime(DateTime.Now), new TimeOnly(DateParameterHour(), 30, 0));
 
-            energyDailyPricesDB = await dataSource.GetDateSpanPrices(dateFrom, dateTo);
+            energyDailyPricesDB = await dataStore.GetDateSpanPrices(dateFrom, dateTo);
 
             return energyDailyPricesDB;
 
@@ -651,13 +649,13 @@ namespace EnergyIOT
         /// Fetches days prices, calculates average
         /// </summary>
         /// <param name="dataStore">IMplementation of IDataStore - Database etc store</param>
-        public async Task<decimal> Trigger_GetDailyAverage(IDataStore dataStore)
+        public async Task<decimal> Trigger_GetDailyAverage()
         {
             List<EnergyPrice> energyPrices = [];
 
             decimal dailyAverage;
 
-            energyPrices = await Trigger_GetDaysPrices(dataStore);
+            energyPrices = await Trigger_GetDaysPrices();
 
             dailyAverage = energyPrices.Select(x => x.ValueIncVat).DefaultIfEmpty(0).Average();
 

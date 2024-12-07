@@ -4,7 +4,7 @@
 #pragma warning disable IDE1006 
 
 namespace EnergyIOT.Models;
-internal class DatabaseConfig
+public class DatabaseConfig
 {
     public string EndpointURI { get; set; }
     public string DatabaseName { get; set; }
@@ -22,7 +22,7 @@ internal class DatabaseConfig
     public string ConfigPartition { get; set; }
 }
 
-internal class EmailConfig
+public class EmailConfig
 {
     public string Server { get; set; }
     public string From { get; set; }
@@ -33,7 +33,7 @@ internal class EmailConfig
     public string Username { get; set; }
 }
 
-internal class EnergyAPIConfig
+public class EnergyAPIConfig
 {
     public string BaseURI { get; set; }
     public string Section { get; set; }
@@ -43,7 +43,7 @@ internal class EnergyAPIConfig
     public string EndSection { get; set; }
 }
 
-internal class DBConfigString
+public class DBConfigString
 {
     public string id { get; set; }
 
@@ -51,7 +51,7 @@ internal class DBConfigString
 
 }
 
-internal class PriceListColour
+public class PriceListColour
 {
     public decimal From { get; set; }
     public decimal To { get; set; }

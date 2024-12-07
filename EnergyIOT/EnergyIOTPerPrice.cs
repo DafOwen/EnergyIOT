@@ -6,10 +6,17 @@ using EnergyIOT.DataAccess;
 
 namespace EnergyIOT
 {
-    public class EnergyIOTPerPrice(ILoggerFactory loggerFactory)
+    public class EnergyIOTPerPrice
     {
-        private readonly ILogger _logger = loggerFactory.CreateLogger<EnergyIOTPerPrice>();
+        private readonly ILogger<EnergyIOTPerPrice> _logger;
+        private readonly IDataStore _dataStore;
         private static ServiceProvider serviceProvider;
+
+        public EnergyIOTPerPrice(ILogger<EnergyIOTPerPrice> logger, IDataStore dataStore)
+        {
+            _logger = logger;
+            _dataStore = dataStore;
+        }
 
         [Function("EnergyIOTPerPrice")]
         public void Run([TimerTrigger("0 */30 * * * *")] TimerInfo myTimer)
@@ -64,12 +71,11 @@ namespace EnergyIOT
             #endregion
 
             #region DataStore/DB
-            DataStoreCosmoDB cosmosDBDataStore = new();
-            cosmosDBDataStore.Config(databaseConfig);
+            _dataStore.Config(databaseConfig);
             #endregion
 
             //Check Override
-            OverrideTrigger overrideTrigger = CheckForOverride(cosmosDBDataStore).GetAwaiter().GetResult();
+            OverrideTrigger overrideTrigger = CheckForOverride().GetAwaiter().GetResult();
 
             if (overrideTrigger != null)
             {
@@ -79,7 +85,7 @@ namespace EnergyIOT
 
             //Mode
             string mode = "";
-            DBConfigString dbConfig = cosmosDBDataStore.GetConfigString("Mode").GetAwaiter().GetResult();
+            DBConfigString dbConfig = _dataStore.GetConfigString("Mode").GetAwaiter().GetResult();
             if (dbConfig != null)
             {
                 mode = dbConfig.Value;
@@ -90,8 +96,8 @@ namespace EnergyIOT
             }
 
             //Call Trigger Manager
-            TriggerManager triggerManager = new(_logger);
-            triggerManager.Trigger_PerPrice_Manager(cosmosDBDataStore, httpClientFactory, emailConfig, mode).GetAwaiter().GetResult();
+            TriggerManager triggerManager = new(_logger, _dataStore);
+            triggerManager.Trigger_PerPrice_Manager( httpClientFactory, emailConfig, mode).GetAwaiter().GetResult();
 
 
             if (myTimer.ScheduleStatus is not null)
@@ -101,12 +107,12 @@ namespace EnergyIOT
         }
 
 
-        internal async Task<OverrideTrigger> CheckForOverride(IDataStore dataStore)
+        internal async Task<OverrideTrigger> CheckForOverride()
         {
             //Get current datetime in str
             string strNowDateUtcShort = DateTime.UtcNow.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'");
 
-            OverrideTrigger overrideTrigger = await dataStore.GetOverride(strNowDateUtcShort);
+            OverrideTrigger overrideTrigger = await _dataStore.GetOverride(strNowDateUtcShort);
 
             return overrideTrigger;
         }

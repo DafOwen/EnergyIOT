@@ -9,11 +9,19 @@ using EnergyIOT.DataAccess;
 
 namespace EnergyIOT
 {
-    public class EnergyIOTMonthly(ILoggerFactory loggerFactory)
+    public class EnergyIOTMonthly
     {
-        private readonly ILogger _logger = loggerFactory.CreateLogger<EnergyIOTMonthly>();
+        private readonly ILogger<EnergyIOTMonthly> _logger;
+        private readonly IDataStore _dataStore;
         private static ServiceProvider serviceProvider;
         private EmailConfig _emailConfig;
+
+        public EnergyIOTMonthly(ILogger<EnergyIOTMonthly> logger, IDataStore dataStore)
+        {
+            _logger = logger;
+            _dataStore = dataStore;
+        }
+
 
         [Function("EnergyIOTMonthly")]
         public void Run([TimerTrigger("0 15 0 1,15 * *")] TimerInfo myTimer)
@@ -76,14 +84,13 @@ namespace EnergyIOT
 
 
             #region DataStore/DB
-            DataStoreCosmoDB cosmosDBDataStore = new();
-            cosmosDBDataStore.Config(databaseConfig);
+            _dataStore.Config(databaseConfig);
             #endregion
 
             try
             {
                 //Get Kasa ActionGroup
-                UpdateRefreshKasaToken(cosmosDBDataStore, kasaAuthConfig).GetAwaiter().GetResult();
+                UpdateRefreshKasaToken( kasaAuthConfig).GetAwaiter().GetResult();
             }
             catch (Exception err)
             {
@@ -97,7 +104,7 @@ namespace EnergyIOT
             }
 
 
-            async Task UpdateRefreshKasaToken(IDataStore dataStore, KasaAuthConfig kasaAuthConfig)
+            async Task UpdateRefreshKasaToken(KasaAuthConfig kasaAuthConfig)
             {
                 //Valid httpCLient
                 var httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
@@ -112,7 +119,7 @@ namespace EnergyIOT
 
 
                 //get orig ActionGroup from DB
-                ActionGroup actionGroup = await dataStore.GetActionGroup("1");
+                ActionGroup actionGroup = await _dataStore.GetActionGroup("1");
                 if (actionGroup == null)
                 {
                     _logger.LogError("UpdateRefreshKasaToken: Kasa Action Group not found");
@@ -170,7 +177,7 @@ namespace EnergyIOT
                     }
 
                     //Update 
-                    dataStore.SetActionGroupToken(actionGroup.id, returnKasa.Result.Token);
+                    _dataStore.SetActionGroupToken(actionGroup.id, returnKasa.Result.Token);
 
                 }
                 catch (Exception ex)

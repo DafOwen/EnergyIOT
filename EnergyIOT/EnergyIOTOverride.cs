@@ -7,14 +7,21 @@ using EnergyIOT.DataAccess;
 
 namespace EnergyIOT
 {
-    public class EnergyIOTOverride(ILogger<EnergyIOTOverride> logger)
+    public class EnergyIOTOverride
     {
-        private readonly ILogger<EnergyIOTOverride> _logger = logger;
+        private readonly ILogger<EnergyIOTOverride> _logger;
+        private readonly IDataStore _dataStore;
 
         private string _startDateTimeStrUTC;
         private DateTime _startDateTimeUTC;
         private string _endDateTimeStrUTC;
         private DateTime _endDateTimeUTC;
+
+        public EnergyIOTOverride(ILogger<EnergyIOTOverride> logger, IDataStore dataStore)
+        {
+            _logger = logger;
+            _dataStore = dataStore;
+        }
 
         [Function("EnergyIOTOverride")]
         public IActionResult Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
@@ -49,8 +56,7 @@ namespace EnergyIOT
 #endregion
 
 #region DataStore/DB
-            DataStoreCosmoDB cosmosDBDataStore = new();
-            cosmosDBDataStore.Config(databaseConfig);
+            _dataStore.Config(databaseConfig);
 #endregion
 
 
@@ -116,7 +122,7 @@ namespace EnergyIOT
             };
 
             //insert/replace
-            cosmosDBDataStore.OverrideInsertUpdate(overrideEntry);
+            _dataStore.OverrideInsertUpdate(overrideEntry);
 
             return new OkObjectResult("Override Inserted");
         }

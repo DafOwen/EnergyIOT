@@ -8,7 +8,7 @@ using EnergyIOT.DataAccess;
 
 namespace EnergyIOT
 {
-    internal class ActionManager(ILogger logger)
+    internal class ActionManager(ILogger logger, IDataStore dataStore)
     {
 
         private IHttpClientFactory _httpClientFactory;
@@ -18,10 +18,9 @@ namespace EnergyIOT
         /// <summary>
         /// Action handler
         /// </summary>
-        /// <param name="dataStore">Implementation of IDataStore - Database etc store</param>
         /// <param name="trigger">Trigger that's calling action</param>
         /// <param name="httpClientFactory">IHttpCLlientFactory to get httpClient</param>
-        public async Task<List<ActionFailure>> RunActions(IDataStore dataStore, Trigger trigger, IHttpClientFactory httpClientFactory)
+        public async Task<List<ActionFailure>> RunActions( Trigger trigger, IHttpClientFactory httpClientFactory)
         {
 
             actionFailures = [];
@@ -40,7 +39,7 @@ namespace EnergyIOT
             var actiongroupIDsUnique = trigger.Actions.Select(a => a.GroupId).Distinct().ToList();
 
 
-            List<ActionGroup> actionGroups = await ActionGroups_ForTrigger(dataStore, actiongroupIDsUnique);
+            List<ActionGroup> actionGroups = await ActionGroups_ForTrigger(actiongroupIDsUnique);
 
             if(actionGroups?.Count == 0)
             {
@@ -78,9 +77,8 @@ namespace EnergyIOT
         /// <summary>
         /// Fetch Action Group data from Data Store - gets all then filters
         /// </summary>
-        /// <param name="dataStore">IMplementation of IDataStore - Database etc store</param>
         /// <param name="actionGroupIDs">List of Action Group ID's</param>
-        public async Task<List<ActionGroup>> ActionGroups_ForTrigger(IDataStore dataStore, List<int> actionGroupIDs)
+        public async Task<List<ActionGroup>> ActionGroups_ForTrigger(List<int> actionGroupIDs)
         {
             List<ActionGroup> actionGroups = await dataStore.GetActionGroups(actionGroupIDs);
 

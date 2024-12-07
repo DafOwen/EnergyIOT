@@ -7,11 +7,20 @@ using EnergyIOT.DataAccess;
 
 namespace EnergyIOT
 {
-    public class EnergyIOTHourlyPM(ILoggerFactory loggerFactory)
+    public class EnergyIOTHourlyPM
     {
-        private readonly ILogger _logger = loggerFactory.CreateLogger<EnergyIOTHourlyPM>();
+        private readonly ILogger<EnergyIOTHourlyPM> _logger;
+        private readonly IDataStore _dataStore;
         private static ServiceProvider serviceProvider;
         private  int utcEndHour = 0;
+
+
+        public EnergyIOTHourlyPM(ILogger<EnergyIOTHourlyPM> logger, IDataStore dataStore)
+        {
+            _logger = logger;
+            _dataStore = dataStore;
+        }
+
 
         [Function("EnergyIOTHourlyPM")]
         public void Run([TimerTrigger("0 0 16-22 * * *")] TimerInfo myTimer)
@@ -75,21 +84,20 @@ namespace EnergyIOT
 
             var httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
 
-#endregion
+            #endregion
 
-#region DataStore/DB
-            DataStoreCosmoDB cosmosDBDataStore = new();
-            cosmosDBDataStore.Config(databaseConfig);
-#endregion
+            #region DataStore/DB
+            _dataStore.Config(databaseConfig);
+            #endregion
 
-            UnitRates unitRates = GetAndSavePrices(cosmosDBDataStore, energyAPIConfig).GetAwaiter().GetResult();
+            UnitRates unitRates = GetAndSavePrices(_dataStore, energyAPIConfig).GetAwaiter().GetResult();
 
             if (unitRates != null)
             {
                 //Hourly Triggers
-                TriggerManager triggerManager = new(_logger);
+                TriggerManager triggerManager = new(_logger, _dataStore);
  
-                triggerManager.Trigger_Hourly_Manager(cosmosDBDataStore, emailConfig, unitRates, pricelistColours);
+                triggerManager.Trigger_Hourly_Manager( emailConfig, unitRates, pricelistColours);
             }
 
             if (myTimer.ScheduleStatus is not null)
@@ -138,7 +146,6 @@ namespace EnergyIOT
             DateTime lastDate = new(DateOnly.FromDateTime(DateTime.Now), new TimeOnly(DateParameterHour(), 00, 0));
             lastDate = lastDate.AddDays(1).AddMinutes(-30); //tomorrow, -30 for start time not end
 
-            //var gotDataTest = TestDataAlreadyGot(dbConfig);
             EnergyPrice priceResponse = await dataStore.GetPriceItemByDate(lastDate);
 
             if (priceResponse != null)
