@@ -8,7 +8,6 @@ namespace EnergyIOT
 {
     internal class TriggerManager(ILogger logger, IDataStore dataStore, IEnumerable<IDevices> devicesGroups)
     {
-        private IHttpClientFactory _httpClientFactory;
         private readonly ILogger _logger = logger;
         private List<ActionFailure> _actionFailures;
         private EmailConfig _emailConfig;
@@ -22,23 +21,19 @@ namespace EnergyIOT
         /// Price Manager - Fetch then call the per price (30min) Triggers
         /// </summary>
         /// <param name="energyAPIConfig">Config values for Energy API</param>
-        /// <param name="httpClientFactory">IHttpClientFactory - client factory</param>
         /// <param name="emailConfig">Emailconfig settings</param>
-        internal async Task Trigger_PerPrice_Manager(IHttpClientFactory httpClientFactory, EmailConfig emailConfig, string mode)
+        internal async Task Trigger_PerPrice_Manager(EmailConfig emailConfig, string mode)
         {
 
             _actionFailures = [];
 
+            //DELETE
             //Validation
-            if (httpClientFactory == null)
-            {
-                _logger.LogError("Trigger_PerPrice_Manager - httpClientFactory is null");
-                throw new ArgumentNullException("Trigger_PerPrice_Manager - httpClientFactory is null");
-            }
-            else
-            {
-                _httpClientFactory = httpClientFactory;
-            }
+            //if (httpClientFactory == null)
+            //{
+            //    _logger.LogError("Trigger_PerPrice_Manager - httpClientFactory is null");
+            //    throw new ArgumentNullException("Trigger_PerPrice_Manager - httpClientFactory is null");
+            //}
 
             if (emailConfig == null)
             {
@@ -377,7 +372,7 @@ namespace EnergyIOT
             {
                 LogTriggerResult("Trigger_PerPrice_PriceAboveBelowValue", triggerItem, "Fire Actions");
                 ActionManager actionManager = new(_logger, dataStore, devicesGroups);
-                List<ActionFailure> actionFailures = await actionManager.RunActions(triggerItem, _httpClientFactory);
+                List<ActionFailure> actionFailures = await actionManager.RunActions(triggerItem);
 
                 if (actionFailures?.Count > 0)
                 {
@@ -438,7 +433,7 @@ namespace EnergyIOT
             if (doAction)
             {
                 ActionManager actionManager = new(_logger, dataStore, devicesGroups);
-                List<ActionFailure> actionFailures = await actionManager.RunActions(triggerItem, _httpClientFactory);
+                List<ActionFailure> actionFailures = await actionManager.RunActions(triggerItem);
                 LogTriggerResult("Trigger_PerPrice_PriceAboveBelowValue", triggerItem, "Fire Actions");
 
                 if (actionFailures?.Count > 0)
@@ -507,7 +502,7 @@ namespace EnergyIOT
             if (doAction)
             {
                 ActionManager actionManager = new(_logger, dataStore, devicesGroups);
-                List<ActionFailure> actionFailures = await actionManager.RunActions(triggerItem, _httpClientFactory);
+                List<ActionFailure> actionFailures = await actionManager.RunActions(triggerItem);
                 LogTriggerResult("Trigger_PerPrice_PriceAboveBelowValue", triggerItem, "Fire Actions");
 
                 if (actionFailures?.Count > 0)

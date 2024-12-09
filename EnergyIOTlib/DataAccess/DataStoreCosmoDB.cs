@@ -203,7 +203,7 @@ namespace EnergyIOT.DataAccess
             return energyPrices;
         }
 
-        public async Task<List<ActionGroup>> GetActionGroups(List<int> actionGroupIDs)
+        public async Task<List<ActionGroup>> GetActionGroups(List<string> actionGroupIDs)
         {
             //simpler to get all action groups then filter to those in actionGroupIDs
 
@@ -222,7 +222,7 @@ namespace EnergyIOT.DataAccess
                 //list of Tuples
                 List<(string, PartitionKey)> itemsToFind = [];
 
-                foreach (int groupID in actionGroupIDs)
+                foreach (string groupID in actionGroupIDs)
                 {
                     itemsToFind.Add((groupID.ToString(), partitionKey));
                 }

@@ -78,6 +78,10 @@ namespace EnergyIOT.Devices
             var content = new StringContent(stringcontent, Encoding.UTF8, "application/json");
 
             var kasaClient = _httpClientFactory.CreateClient("kasaAPI");
+            if (kasaClient.BaseAddress == null)
+            {
+                kasaClient.BaseAddress = new Uri(deviceAuthConfig.BaseURI);
+            }
 
             try
             {
@@ -177,6 +181,10 @@ namespace EnergyIOT.Devices
             var content = new StringContent(stringcontent, Encoding.UTF8, "application/json");
 
             var kasaClient = _httpClientFactory.CreateClient("kasaAPI");
+            if (kasaClient.BaseAddress == null)
+            {
+                kasaClient.BaseAddress = new Uri(deviceAuthConfig.BaseURI);
+            }
 
             //Call Refresh API
             try
@@ -230,6 +238,7 @@ namespace EnergyIOT.Devices
             {
                 clientKasaPlug.BaseAddress = new Uri(actionGroup.BaseURL);
             }
+
             string path = "?token=" + actionGroup.Token;
 
 

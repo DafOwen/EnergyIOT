@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using EnergyIOT.Models;
 using EnergyIOT.DataAccess;
 using EnergyIOT.Devices;
-using System.Collections.Generic;
 
 namespace EnergyIOT
 {
@@ -12,14 +11,16 @@ namespace EnergyIOT
     {
         private readonly ILogger<EnergyIOTPerPrice> _logger;
         private readonly IDataStore _dataStore;
-        private static ServiceProvider serviceProvider;
         private readonly IEnumerable<IDevices> _devicesGroups;
+        IHttpClientFactory _httpClientFactory;
 
-        public EnergyIOTPerPrice(ILogger<EnergyIOTPerPrice> logger, IDataStore dataStore, IEnumerable<IDevices> devicesGroups)
+        public EnergyIOTPerPrice(ILogger<EnergyIOTPerPrice> logger, IDataStore dataStore, 
+                                IEnumerable<IDevices> devicesGroups, IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
             _dataStore = dataStore;
             _devicesGroups = devicesGroups;
+            _httpClientFactory = httpClientFactory;
         }
 
         [Function("EnergyIOTPerPrice")]
@@ -52,23 +53,6 @@ namespace EnergyIOT
             }
             #endregion
 
-            #region IHttpClientFactory
-            //Set up IHttpClientFactory ----------------------
-
-            //Get HttpCLient for Injections
-            var serviceCollection = new ServiceCollection();
-            serviceCollection.AddHttpClient("clientEnergyAPI", x =>
-            {
-                x.BaseAddress = new Uri(energyAPIConfig.BaseURI);
-                x.DefaultRequestHeaders.Accept.Clear();
-                x.DefaultRequestHeaders.Add("Accept", "application/json");
-            });
-            serviceCollection.BuildServiceProvider();
-            serviceProvider = serviceCollection.BuildServiceProvider();
-            var httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
-
-            #endregion
-
             #region DataStore/DB
             _dataStore.Config(databaseConfig);
             #endregion
@@ -96,7 +80,7 @@ namespace EnergyIOT
 
             //Call Trigger Manager
             TriggerManager triggerManager = new(_logger, _dataStore, _devicesGroups);
-            triggerManager.Trigger_PerPrice_Manager( httpClientFactory, emailConfig, mode).GetAwaiter().GetResult();
+            triggerManager.Trigger_PerPrice_Manager(emailConfig, mode).GetAwaiter().GetResult();
 
 
             if (myTimer.ScheduleStatus is not null)

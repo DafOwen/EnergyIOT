@@ -22,9 +22,8 @@ public class Trigger
 public class Action
 {
     public string ItemId { get; set; }
-    public string GroupName { get; set; }
+    public string GroupId { get; set; }
     public string ItemName { get; set; }
-    public int GroupId { get; set; }
     public string DeviceId { get; set; }
     public string Type { get; set; }
     public int StateTo { get; set; }

@@ -10,7 +10,7 @@ namespace EnergyIOT.DataAccess
         Task<List<Trigger>> GetPerPriceTriggers(string mode);
         Task<List<Trigger>> GetHourlyTriggersSorted();
         Task<List<EnergyPrice>> GetDateSpanPrices(DateTime dateFrom, DateTime dateTo);
-        Task<List<ActionGroup>> GetActionGroups(List<int> actionGroupIDs);
+        Task<List<ActionGroup>> GetActionGroups(List<string> actionGroupIDs);
         Task<ActionGroup> GetActionGroup(string actionGroupID);
         Task SaveActionGroup(ActionGroup actionGroup);
         Task SetActionGroupToken(string actionGroupID, string token);

@@ -4,9 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using EnergyIOT.Models;
 using EnergyIOT.DataAccess;
 using EnergyIOT.Devices;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
-using static System.Formats.Asn1.AsnWriter;
-using System;
 
 namespace EnergyIOT
 {
@@ -15,15 +12,16 @@ namespace EnergyIOT
         private readonly ILogger<EnergyIOTMonthly> _logger;
         private readonly IDataStore _dataStore;
         private readonly IEnumerable<IDevices> _deviceGroupList;
-        private static ServiceProvider _serviceProvider;
         private EmailConfig _emailConfig;
-        private readonly IKeyedServiceProvider _keyedServiceProvider;
-        public EnergyIOTMonthly(ILogger<EnergyIOTMonthly> logger, IDataStore dataStore, IEnumerable<IDevices> devicesGroups)
+        private IHttpClientFactory _httpClientFactory;
+
+        public EnergyIOTMonthly(ILogger<EnergyIOTMonthly> logger, IDataStore dataStore, IEnumerable<IDevices> devicesGroups
+                                , IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
             _dataStore = dataStore;
             _deviceGroupList = devicesGroups;
-            //_keyedServiceProvider = keyedServiceProvider;
+            _httpClientFactory = httpClientFactory;
 
         }
 

@@ -12,7 +12,6 @@ namespace EnergyIOT
     {
         private readonly ILogger<EnergyIOTHourlyPM> _logger;
         private readonly IDataStore _dataStore;
-        private static ServiceProvider serviceProvider;
         private  int utcEndHour = 0;
         private IHttpClientFactory  _httpClientFactory;
         private readonly IEnumerable<IDevices> _devicesGroups;
@@ -69,26 +68,6 @@ namespace EnergyIOT
                 _logger.LogError("Price List Colour Env Variables not found");
                 //no need to exit, non critical
             }
-
-            #endregion
-
-#region IHttpClientFactory
-            //Set up IHttpClientFactory ----------------------
-
-            //Get HttpCLient for Injections
-            //var serviceCollection = new ServiceCollection();
-            //serviceCollection.AddHttpClient("clientEnergyAPI", x =>
-            //{
-            //    x.BaseAddress = new Uri(energyAPIConfig.BaseURI);
-            //    x.DefaultRequestHeaders.Accept.Clear();
-            //    x.DefaultRequestHeaders.Add("Accept", "application/json");
-            //});
-
-            //serviceCollection.BuildServiceProvider();
-
-            //serviceProvider = serviceCollection.BuildServiceProvider();
-
-            //var httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
 
             #endregion
 
@@ -190,15 +169,14 @@ namespace EnergyIOT
 
         async Task<UnitRates> CallEnergyAPIAsync(EnergyAPIConfig energyAPI)
         {
-            var httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
 
-            if (httpClientFactory == null)
+            if (_httpClientFactory == null)
             {
                 _logger.LogError("CallEnergyAPIAsync : httpClientFactory is NULL");
                 return null;
             }
 
-            var client = httpClientFactory.CreateClient();
+            var client = _httpClientFactory.CreateClient();
             client.BaseAddress = new Uri(energyAPI.BaseURI);
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Add("Accept", "application/json");

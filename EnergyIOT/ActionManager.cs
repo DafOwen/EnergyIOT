@@ -1,7 +1,4 @@
-﻿using System.Text;
-using System.Text.Json;
-using System.Net;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using EnergyIOT.Models;
 using Action = EnergyIOT.Models.Action;
 using EnergyIOT.DataAccess;
@@ -12,30 +9,24 @@ namespace EnergyIOT
 {
     internal class ActionManager(ILogger logger, IDataStore dataStore, IEnumerable<IDevices> devicesGroups)
     {
-
-        private IHttpClientFactory _httpClientFactory;
-        private HttpClient clientKasaPlug;
         private List<ActionFailure> actionFailures;
 
         /// <summary>
         /// Action handler
         /// </summary>
         /// <param name="trigger">Trigger that's calling action</param>
-        /// <param name="httpClientFactory">IHttpCLlientFactory to get httpClient</param>
-        public async Task<List<ActionFailure>> RunActions( Trigger trigger, IHttpClientFactory httpClientFactory)
+        public async Task<List<ActionFailure>> RunActions( Trigger trigger)
         {
 
             actionFailures = [];
 
-            if (httpClientFactory == null)
-            {
-                logger.LogError("ActionManager-RunActions: httpClientFactor is null");
-                FailureAdd(trigger.Name, null, "ActionManager-RunActions: httpClientFactor is null");
-                return actionFailures;
-            }
-
-            _httpClientFactory = httpClientFactory;
-            clientKasaPlug = _httpClientFactory.CreateClient("kasaAPI");
+            //DELETE
+            //if (httpClientFactory == null)
+            //{
+            //    logger.LogError("ActionManager-RunActions: httpClientFactor is null");
+            //    FailureAdd(trigger.Name, null, "ActionManager-RunActions: httpClientFactor is null");
+            //    return actionFailures;
+            //}
 
             //get action group info for all
             var actiongroupIDsUnique = trigger.Actions.Select(a => a.GroupId).Distinct().ToList();
@@ -57,7 +48,7 @@ namespace EnergyIOT
                 ActionGroup singleActionGroup = actionGroups.Find(x => x.id == actionItem.GroupId.ToString());
 
                 //get DI Device item
-                IDevices singleDevices = devicesGroups.SingleOrDefault(p => p.Name == actionItem.GroupName);
+                IDevices singleDevices = devicesGroups.SingleOrDefault(p => p.Name == actionItem.GroupId);
 
                 if (singleDevices == null)
                 {
@@ -93,8 +84,8 @@ namespace EnergyIOT
         /// <summary>
         /// Fetch Action Group data from Data Store - gets all then filters
         /// </summary>
-        /// <param name="actionGroupIDs">List of Action Group ID's</param>
-        public async Task<List<ActionGroup>> ActionGroups_ForTrigger(List<int> actionGroupIDs)
+        /// <param name="actionGroupIDs">List of Action Group/Name ID's</param>
+        public async Task<List<ActionGroup>> ActionGroups_ForTrigger(List<string> actionGroupIDs)
         {
             List<ActionGroup> actionGroups = await dataStore.GetActionGroups(actionGroupIDs);
 

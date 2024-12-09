@@ -2,7 +2,7 @@
   "profiles": {
     "EnergyIOTDataSetup": {
       "commandName": "Project",
-      "commandLineArgs": "/KR"
+      "commandLineArgs": "/DB"
     }
   }
 }
