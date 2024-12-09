@@ -20,14 +20,6 @@ namespace EnergyIOT
 
             actionFailures = [];
 
-            //DELETE
-            //if (httpClientFactory == null)
-            //{
-            //    logger.LogError("ActionManager-RunActions: httpClientFactor is null");
-            //    FailureAdd(trigger.Name, null, "ActionManager-RunActions: httpClientFactor is null");
-            //    return actionFailures;
-            //}
-
             //get action group info for all
             var actiongroupIDsUnique = trigger.Actions.Select(a => a.GroupId).Distinct().ToList();
 

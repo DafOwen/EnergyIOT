@@ -1,5 +1,4 @@
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using EnergyIOT.Models;
 using EnergyIOT.DataAccess;
@@ -12,15 +11,12 @@ namespace EnergyIOT
         private readonly ILogger<EnergyIOTPerPrice> _logger;
         private readonly IDataStore _dataStore;
         private readonly IEnumerable<IDevices> _devicesGroups;
-        IHttpClientFactory _httpClientFactory;
 
-        public EnergyIOTPerPrice(ILogger<EnergyIOTPerPrice> logger, IDataStore dataStore, 
-                                IEnumerable<IDevices> devicesGroups, IHttpClientFactory httpClientFactory)
+        public EnergyIOTPerPrice(ILogger<EnergyIOTPerPrice> logger, IDataStore dataStore,IEnumerable<IDevices> devicesGroups)
         {
             _logger = logger;
             _dataStore = dataStore;
             _devicesGroups = devicesGroups;
-            _httpClientFactory = httpClientFactory;
         }
 
         [Function("EnergyIOTPerPrice")]

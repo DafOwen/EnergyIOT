@@ -27,14 +27,6 @@ namespace EnergyIOT
 
             _actionFailures = [];
 
-            //DELETE
-            //Validation
-            //if (httpClientFactory == null)
-            //{
-            //    _logger.LogError("Trigger_PerPrice_Manager - httpClientFactory is null");
-            //    throw new ArgumentNullException("Trigger_PerPrice_Manager - httpClientFactory is null");
-            //}
-
             if (emailConfig == null)
             {
                 _logger.LogError("Trigger_PerPrice_Manager - emailConfig is null");

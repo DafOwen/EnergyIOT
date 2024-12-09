@@ -1,8 +1,6 @@
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
 using EnergyIOT.Models;
-using EnergyIOT.DataAccess;
 using EnergyIOT.Devices;
 
 namespace EnergyIOT
@@ -10,19 +8,13 @@ namespace EnergyIOT
     public class EnergyIOTMonthly
     {
         private readonly ILogger<EnergyIOTMonthly> _logger;
-        private readonly IDataStore _dataStore;
         private readonly IEnumerable<IDevices> _deviceGroupList;
         private EmailConfig _emailConfig;
-        private IHttpClientFactory _httpClientFactory;
 
-        public EnergyIOTMonthly(ILogger<EnergyIOTMonthly> logger, IDataStore dataStore, IEnumerable<IDevices> devicesGroups
-                                , IHttpClientFactory httpClientFactory)
+        public EnergyIOTMonthly(ILogger<EnergyIOTMonthly> logger, IEnumerable<IDevices> devicesGroups)
         {
             _logger = logger;
-            _dataStore = dataStore;
             _deviceGroupList = devicesGroups;
-            _httpClientFactory = httpClientFactory;
-
         }
 
 
