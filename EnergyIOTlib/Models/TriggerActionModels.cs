@@ -36,10 +36,10 @@ public class ModesItem
 
     public bool Active { get; set; }
 }
+
 public class ActionGroup
 {
     public string id { get; set; }
-    public string GroupName { get; set; }
     public string BaseURL { get; set; }
     public string Token { get; set; }
     public string RefreshToken { get; set; }
@@ -71,4 +71,22 @@ public class OverrideTrigger
 
     //updated - just for records - local
     public DateTime Updated { get; set; }
+}
+
+// -----------------DataSetup Models-----------------------
+
+public class TriggerImport
+{
+    public string id { get; set; }
+    public string Name { get; set; }
+    public string Interval { get; set; }
+    public string Type { get; set; }
+    public int Order { get; set; }
+    public bool Active { get; set; }
+    public decimal? Value { get; set; }
+
+    //use function/host setting public string logging { get; set; }
+    public List<int> ActionIDs { get; set; }
+
+    public List<ModesItem> Modes { get; set; }
 }

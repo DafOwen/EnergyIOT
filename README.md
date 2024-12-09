@@ -7,11 +7,16 @@ Built as a replacement to IFTTT which I wasn't very happy with.
 | Date | Description |
 | :---: | :---: |
 | 2024-11-27 | Modes : Introducing modes where Triggers can be assigned a mode where they work e.g. only >0 or <0 price |
+| 2024-12-09 | Refactor : Refactor to enable Dependency Injection for Devices (Kasa Plugs) + move core code to library project<br> <strong>Note: Breaking changes</strong> : spelling correction done for some Environmental variables "Parition" to "Partition" e.g. Database_ActionGroupPartition <br> Also ActionGroup database entry has changed (GroupName replacing id)|
 
 
 ### EnergyIOT
 
 Main project of the solution - Azure function app with four functions
+
+### EnergyIOTlib
+
+Library file containing common code shared between EnergyIOT and EnergyIOTDataSetup
 
 ### EnergyIOTDataSetup
 

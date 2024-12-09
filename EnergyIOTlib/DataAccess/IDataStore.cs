@@ -12,6 +12,7 @@ namespace EnergyIOT.DataAccess
         Task<List<EnergyPrice>> GetDateSpanPrices(DateTime dateFrom, DateTime dateTo);
         Task<List<ActionGroup>> GetActionGroups(List<int> actionGroupIDs);
         Task<ActionGroup> GetActionGroup(string actionGroupID);
+        Task SaveActionGroup(ActionGroup actionGroup);
         Task SetActionGroupToken(string actionGroupID, string token);
         Task OverrideInsertUpdate(OverrideTrigger overrideItem);
         Task<OverrideTrigger> GetOverride(string idStartDate);

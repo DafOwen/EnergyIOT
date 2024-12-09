@@ -1,13 +1,14 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace EnergyIOTDataSetup.Models;
+// Allow "id" property name - needed by Cosmos else swap tp Newtonsoft or custom Cosmos serializer
+#pragma warning disable IDE1006 
 
-//--------------------COnfig Section--------------------------
+namespace EnergyIOT.Models;
 public class DatabaseConfig
 {
     public string EndpointURI { get; set; }
     public string DatabaseName { get; set; }
-    public int? DatabaseRUMax { get; set; }
+    public int DatabaseRUMax { get; set; }
     public string PrimaryKey { get; set; }
     public string PriceCollection { get; set; }
     public string PricePartition { get; set; }
@@ -19,10 +20,9 @@ public class DatabaseConfig
     public string OverridePartition { get; set; }
     public string ConfigCollection { get; set; }
     public string ConfigPartition { get; set; }
-
 }
 
-internal class EmailConfig
+public class EmailConfig
 {
     public string Server { get; set; }
     public string From { get; set; }
@@ -33,7 +33,32 @@ internal class EmailConfig
     public string Username { get; set; }
 }
 
-internal class KasaAuthConfig
+public class EnergyAPIConfig
+{
+    public string BaseURI { get; set; }
+    public string Section { get; set; }
+    public string Product { get; set; }
+    public string SubSection { get; set; }
+    public string TariffCode { get; set; }
+    public string EndSection { get; set; }
+}
+
+public class DBConfigString
+{
+    public string id { get; set; }
+
+    public string Value { get; set; }
+
+}
+
+public class PriceListColour
+{
+    public decimal From { get; set; }
+    public decimal To { get; set; }
+    public string Colour { get; set; }
+}
+
+public class DeviceAuthConfig
 {
     public string BaseURI { get; set; }
     public string Method { get; set; }
@@ -42,22 +67,4 @@ internal class KasaAuthConfig
     public string CloudPassword { get; set; }
     public string TerminalUUID { get; set; }
     public bool RefreshTokenNeeded { get; set; }
-}
-
-
-//-----------------DB Config------------------------
-
-internal class DBConfigString
-{
-    public string id { get; set; }
-
-    public string Value { get; set; }
-
-}
-
-internal class PriceListColour
-{
-    public decimal From { get; set; }
-    public decimal To { get; set; }
-    public string Colour { get; set; }
 }

@@ -3,6 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using EnergyIOT.Models;
 using EnergyIOT.DataAccess;
+using EnergyIOT.Devices;
+using System.Collections.Generic;
 
 namespace EnergyIOT
 {
@@ -11,11 +13,13 @@ namespace EnergyIOT
         private readonly ILogger<EnergyIOTPerPrice> _logger;
         private readonly IDataStore _dataStore;
         private static ServiceProvider serviceProvider;
+        private readonly IEnumerable<IDevices> _devicesGroups;
 
-        public EnergyIOTPerPrice(ILogger<EnergyIOTPerPrice> logger, IDataStore dataStore)
+        public EnergyIOTPerPrice(ILogger<EnergyIOTPerPrice> logger, IDataStore dataStore, IEnumerable<IDevices> devicesGroups)
         {
             _logger = logger;
             _dataStore = dataStore;
+            _devicesGroups = devicesGroups;
         }
 
         [Function("EnergyIOTPerPrice")]
@@ -59,11 +63,6 @@ namespace EnergyIOT
                 x.DefaultRequestHeaders.Accept.Clear();
                 x.DefaultRequestHeaders.Add("Accept", "application/json");
             });
-            serviceCollection.AddHttpClient("clientKasaPlugAPI", x =>
-            {
-                x.DefaultRequestHeaders.Accept.Clear();
-                x.DefaultRequestHeaders.Add("Accept", "application/json");
-            });
             serviceCollection.BuildServiceProvider();
             serviceProvider = serviceCollection.BuildServiceProvider();
             var httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
@@ -96,7 +95,7 @@ namespace EnergyIOT
             }
 
             //Call Trigger Manager
-            TriggerManager triggerManager = new(_logger, _dataStore);
+            TriggerManager triggerManager = new(_logger, _dataStore, _devicesGroups);
             triggerManager.Trigger_PerPrice_Manager( httpClientFactory, emailConfig, mode).GetAwaiter().GetResult();
 
 

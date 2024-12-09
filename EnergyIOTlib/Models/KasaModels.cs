@@ -1,13 +1,12 @@
 ﻿using System.Text.Json.Serialization;
 
-// Allow "id" property name - needed by Cosmos else swap tp Newtonsoft or custom Cosmos serializer
-#pragma warning disable IDE1006 // Naming Styles
-
-namespace EnergyIOTDataSetup.Models;
+namespace EnergyIOT.Models;
 
 
 //-----------Kasa authenticate----------------
-internal class KasaTryAuthenticate
+
+//Used for 1st authentication - not in this project, instead EnergyIOTDataSetup
+public class KasaTryAuthenticate
 {
     [JsonPropertyName("method")]
     public string Method { get; set; }
@@ -16,7 +15,7 @@ internal class KasaTryAuthenticate
     public KasaTryAuthenticateParams KasaAuthenticateParams { get; set; }
 }
 
-internal class KasaTryAuthenticateParams
+public class KasaTryAuthenticateParams
 {
     [JsonPropertyName("appType")]
     public string AppType { get; set; }
@@ -34,20 +33,19 @@ internal class KasaTryAuthenticateParams
     public bool RefreshTokenNeeded { get; set; }
 }
 
-internal class KasaAuthenticated
+public class KasaAuthenticated
 {
     [JsonPropertyName("error_code")]
     public int ErrorCode { get; set; }
 
-    //error Msg
+    //error msg
     [JsonPropertyName("msg")]
     public string Msg { get; set; }
 
     [JsonPropertyName("result")]
     public KasaAuthenticatedResult Result { get; set; }
 }
-
-internal class KasaAuthenticatedResult
+public class KasaAuthenticatedResult
 {
     [JsonPropertyName("accountId")]
     public string AccountId { get; set; }
@@ -74,19 +72,19 @@ internal class KasaAuthenticatedResult
     public string RefreshToken { get; set; }
 }
 
-//---------------Refresh----------
 
-internal class KasaAuthRefresh
+//---------------KASA Refresh----------
+
+public class KasaAuthRefresh
 {
     [JsonPropertyName("method")]
     public string Method { get; set; }
-
 
     [JsonPropertyName("params")]
     public KasaAuthRefreshParams Kasarefreshparams { get; set; }
 }
 
-internal class KasaAuthRefreshParams
+public class KasaAuthRefreshParams
 {
     [JsonPropertyName("appType")]
     public string AppType { get; set; }
@@ -98,13 +96,13 @@ internal class KasaAuthRefreshParams
     public string RefreshToken { get; set; }
 }
 
-internal class KasaAuthRefreshReturnResult
+public class KasaAuthRefreshReturnResult
 {
     [JsonPropertyName("token")]
     public string Token { get; set; }
 }
 
-internal class KasaAuthRefreshReturn
+public class KasaAuthRefreshReturn
 {
     [JsonPropertyName("error_code")]
     public int ErrorCode { get; set; }
@@ -118,9 +116,8 @@ internal class KasaAuthRefreshReturn
     public KasaAuthRefreshReturnResult Result { get; set; }
 }
 
-
 //-------------Kasa Actions -----------------
-internal class KasaPassthrough
+public class KasaPassthrough
 {
     [JsonPropertyName("method")]
     public string Method { get; set; }
@@ -129,7 +126,7 @@ internal class KasaPassthrough
     public KasaParams Params { get; set; }
 }
 
-internal class KasaParams
+public class KasaParams
 {
     [JsonPropertyName("deviceId")]
     public string DeviceId { get; set; }
@@ -152,25 +149,25 @@ internal class KasaParams
     }
 }
 
-internal class KasaRequestData
+public class KasaRequestData
 {
     [JsonPropertyName("system")]
     public KasaRequestSystem System { get; set; }
 }
 
-internal class KasaRequestSystem
+public class KasaRequestSystem
 {
     [JsonPropertyName("set_relay_state")]
     public KasaRequestRelayState SetRelayState { get; set; }
 }
 
-internal class KasaRequestRelayState
+public class KasaRequestRelayState
 {
     [JsonPropertyName("state")]
     public int State { get; set; }
 }
 
-internal class KasaReturn
+public class KasaReturn
 {
     [JsonPropertyName("error_code")]
     public int ErrorCode { get; set; }
@@ -184,7 +181,7 @@ internal class KasaReturn
     public KasaReturnResponseData Result { get; set; }
 }
 
-internal class KasaReturnResponseData
+public class KasaReturnResponseData
 {
     [JsonPropertyName("responseData")]
     public string ResponseData { get; set; }
@@ -196,28 +193,26 @@ internal class KasaReturnResponseData
     }
 }
 
-internal class KasaReturnResponseDataObj
+public class KasaReturnResponseDataObj
 {
     [JsonPropertyName("system")]
     public KasaReturnResponseSystem System { get; set; }
 }
 
-internal class KasaReturnResponseSystem
+public class KasaReturnResponseSystem
 {
     [JsonPropertyName("set_relay_state")]
     public KasaReturnErrCOde SetRelayState { get; set; }
 }
 
-internal class KasaReturnErrCOde
+public class KasaReturnErrCOde
 {
     [JsonPropertyName("err_code")]
     public int ErrorCode { get; set; }
 }
 
-internal class KasaDevices
+public class KasaDevices
 {
     [JsonPropertyName("method")]
     public string Method { get; set; }
 }
-
-

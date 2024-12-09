@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using EnergyIOT.Models;
 using EnergyIOT.DataAccess;
+using EnergyIOT.Devices;
 
 namespace EnergyIOT
 {
@@ -13,12 +14,17 @@ namespace EnergyIOT
         private readonly IDataStore _dataStore;
         private static ServiceProvider serviceProvider;
         private  int utcEndHour = 0;
+        private IHttpClientFactory  _httpClientFactory;
+        private readonly IEnumerable<IDevices> _devicesGroups;
 
 
-        public EnergyIOTHourlyPM(ILogger<EnergyIOTHourlyPM> logger, IDataStore dataStore)
+        public EnergyIOTHourlyPM(ILogger<EnergyIOTHourlyPM> logger, IDataStore dataStore,
+                                IHttpClientFactory httpClientFactory, IEnumerable<IDevices> devicesGroups)
         {
             _logger = logger;
             _dataStore = dataStore;
+            _httpClientFactory = httpClientFactory;
+            _devicesGroups = devicesGroups;
         }
 
 
@@ -30,7 +36,7 @@ namespace EnergyIOT
 
             TimeZoneInfo homeTimeZone = TimeZoneInfo.FindSystemTimeZoneById(System.Environment.GetEnvironmentVariable("WEBSITE_TIME_ZONE"));
 
- #region GetConfiguration
+            #region GetConfiguration
             //Get CONFIGURATION------------------
             ConfigManagerFunction configManager;
             EnergyAPIConfig energyAPIConfig;
@@ -70,19 +76,19 @@ namespace EnergyIOT
             //Set up IHttpClientFactory ----------------------
 
             //Get HttpCLient for Injections
-            var serviceCollection = new ServiceCollection();
-            serviceCollection.AddHttpClient("clientEnergyAPI", x =>
-            {
-                x.BaseAddress = new Uri(energyAPIConfig.BaseURI);
-                x.DefaultRequestHeaders.Accept.Clear();
-                x.DefaultRequestHeaders.Add("Accept", "application/json");
-            });
+            //var serviceCollection = new ServiceCollection();
+            //serviceCollection.AddHttpClient("clientEnergyAPI", x =>
+            //{
+            //    x.BaseAddress = new Uri(energyAPIConfig.BaseURI);
+            //    x.DefaultRequestHeaders.Accept.Clear();
+            //    x.DefaultRequestHeaders.Add("Accept", "application/json");
+            //});
 
-            serviceCollection.BuildServiceProvider();
+            //serviceCollection.BuildServiceProvider();
 
-            serviceProvider = serviceCollection.BuildServiceProvider();
+            //serviceProvider = serviceCollection.BuildServiceProvider();
 
-            var httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
+            //var httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
 
             #endregion
 
@@ -95,7 +101,7 @@ namespace EnergyIOT
             if (unitRates != null)
             {
                 //Hourly Triggers
-                TriggerManager triggerManager = new(_logger, _dataStore);
+                TriggerManager triggerManager = new(_logger, _dataStore, _devicesGroups);
  
                 triggerManager.Trigger_Hourly_Manager( emailConfig, unitRates, pricelistColours);
             }
@@ -192,7 +198,11 @@ namespace EnergyIOT
                 return null;
             }
 
-            var client = httpClientFactory.CreateClient("clientEnergyAPI");
+            var client = httpClientFactory.CreateClient();
+            client.BaseAddress = new Uri(energyAPI.BaseURI);
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
+
 
             string endpointURI = energyAPI.Section
                     + energyAPI.Product 

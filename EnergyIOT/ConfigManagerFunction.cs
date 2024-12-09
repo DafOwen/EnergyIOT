@@ -3,12 +3,12 @@ using EnergyIOT.Models;
 
 namespace EnergyIOT
 {
-    internal class ConfigManagerFunction
+    public class ConfigManagerFunction
     {
         private readonly DatabaseConfig _DatabaseConfig;
         private EmailConfig _EmailConfig;
         private readonly EnergyAPIConfig _EnergyAPIConfig;
-        private KasaAuthConfig _KasaAuthConfig;
+        private DeviceAuthConfig _DeviceAuthConfig;
 
 
         public ConfigManagerFunction()
@@ -23,11 +23,11 @@ namespace EnergyIOT
                 PriceCollection = GetEnvAriableStr("Database_PriceCollection"),
                 PricePartition = GetEnvAriableStr("Database_PricePartition"),
                 TriggerCollection = GetEnvAriableStr("Database_TriggerCollection"),
-                TriggerParition = GetEnvAriableStr("Database_TriggerParition"),
+                TriggerPartition = GetEnvAriableStr("Database_TriggerPartition"),
                 ActionGroupCollection = GetEnvAriableStr("Database_ActionGroupCollection"),
-                ActionGroupParition = GetEnvAriableStr("Database_ActionGroupParition"),
+                ActionGroupPartition = GetEnvAriableStr("Database_ActionGroupPartition"),
                 OverrideCollection = GetEnvAriableStr("Database_OverrideCollection"),
-                OverrideParition = GetEnvAriableStr("Database_OverrideParition"),
+                OverridePartition = GetEnvAriableStr("Database_OverridePartition"),
                 ConfigCollection = GetEnvAriableStr("Database_ConfigCollection"),
                 ConfigPartition = GetEnvAriableStr("Database_ConfigPartition")
             };
@@ -64,23 +64,23 @@ namespace EnergyIOT
             return _EmailConfig;
         }
 
-
-        public KasaAuthConfig GetKasaAuthConfig()
+        public DeviceAuthConfig GetDeviceAuthConfig()
         {
-            _KasaAuthConfig ??= new KasaAuthConfig();
+            _DeviceAuthConfig ??= new DeviceAuthConfig();
 
-            _KasaAuthConfig.AppType = GetEnvAriableStr("KasaAuth_appType");
-            _KasaAuthConfig.Method = GetEnvAriableStr("KasaAuth_method");
-            _KasaAuthConfig.BaseURI = GetEnvAriableStr("KasaAuth_BaseURI");
-            _KasaAuthConfig.CloudUserName = GetEnvAriableStr("KasaAuth_cloudUserName");
-            _KasaAuthConfig.CloudUserName = GetEnvAriableStr("KasaAuth_cloudPassword");
-            _KasaAuthConfig.TerminalUUID = GetEnvAriableStr("KasaAuth_terminalUUID");
-            _KasaAuthConfig.RefreshTokenNeeded = GetEnvAriableBool("KasaAuth_refreshTokenNeeded");
+            _DeviceAuthConfig.AppType = GetEnvAriableStr("KasaAuth_appType");
+            _DeviceAuthConfig.Method = GetEnvAriableStr("KasaAuth_method");
+            _DeviceAuthConfig.BaseURI = GetEnvAriableStr("KasaAuth_BaseURI");
+            _DeviceAuthConfig.CloudUserName = GetEnvAriableStr("KasaAuth_cloudUserName");
+            _DeviceAuthConfig.CloudUserName = GetEnvAriableStr("KasaAuth_cloudPassword");
+            _DeviceAuthConfig.TerminalUUID = GetEnvAriableStr("KasaAuth_terminalUUID");
+            _DeviceAuthConfig.RefreshTokenNeeded = GetEnvAriableBool("KasaAuth_refreshTokenNeeded");
 
-            return _KasaAuthConfig;
+            return _DeviceAuthConfig;
         }
 
-        private string GetEnvAriableStr(string parameterName)
+
+        public string GetEnvAriableStr(string parameterName)
         {
             string newVar = System.Environment.GetEnvironmentVariable(parameterName);
             if (newVar == null)
@@ -91,7 +91,7 @@ namespace EnergyIOT
             }
         }
 
-        private int GetEnvAriableInt(string parameterName)
+        public int GetEnvAriableInt(string parameterName)
         {
             var newVar = System.Environment.GetEnvironmentVariable(parameterName);
             if (newVar == null)
@@ -104,7 +104,7 @@ namespace EnergyIOT
             }
         }
 
-        private bool GetEnvAriableBool(string parameterName)
+        public bool GetEnvAriableBool(string parameterName)
         {
             var newVar = System.Environment.GetEnvironmentVariable(parameterName);
             if (newVar == null)
