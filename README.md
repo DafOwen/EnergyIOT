@@ -1,6 +1,6 @@
 # EnergyIOT
 
-Octopus Energy + (TP-Link Kasa) Smart Switch API
+Octopus Energy + (TP-Link Kasa/Tapo) Smart Switch API
 Built as a replacement to IFTTT which I wasn't very happy with.
 
 ### Updates
