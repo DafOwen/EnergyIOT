@@ -1,17 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using EnergyIOT.DataAccess;
 using EnergyIOT.Models;
 using Action = EnergyIOT.Models.Action;
 
 namespace EnergyIOT.Devices
 {
-    public class TPLinkKasa :  IDevices
+    public class TPLinkKasa : IDevices
     {
         IHttpClientFactory _httpClientFactory;
         IDataStore _dataStore;
@@ -23,10 +21,9 @@ namespace EnergyIOT.Devices
         {
             _dataStore = datastore;
             _httpClientFactory = httpClientFactory;
-            this.Name = "Kasa";
         }
 
-        public string Name { get; }
+        public string Name => "Kasa";
 
         public void DataConfig(DatabaseConfig databaseConfig)
         {
@@ -39,11 +36,11 @@ namespace EnergyIOT.Devices
 
             if (_httpClientFactory == null)
             {
-                throw new Exception("GetRefreshKasaToken : httpClientFactory is NULL");
+                throw new Exception("Kasa:AuthenticateFirst : httpClientFactory is NULL");
             }
             if (_databaseConfig == null)
             {
-                throw new Exception("Kasa:RefreshToken : databaseConfig is NULL");
+                throw new Exception("Kasa:AuthenticateFirst : databaseConfig is NULL");
             }
 
             //get orig ActionGroup from DB
@@ -71,7 +68,8 @@ namespace EnergyIOT.Devices
             var serializeOptions = new JsonSerializerOptions
             {
                 //WriteIndented = true
-                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
 
             string stringcontent = System.Text.Json.JsonSerializer.Serialize(kasaTryAuthenticate, serializeOptions);
@@ -80,18 +78,16 @@ namespace EnergyIOT.Devices
             var kasaClient = _httpClientFactory.CreateClient("kasaAPI");
             if (kasaClient.BaseAddress == null)
             {
-                kasaClient.BaseAddress = new Uri(deviceAuthConfig.BaseURI);
+                kasaClient.BaseAddress = new Uri(deviceAuthConfig.AuthURI);
             }
 
             try
             {
-                var result = await kasaClient.PostAsync(new Uri(deviceAuthConfig.BaseURI), content);
+                var result = await kasaClient.PostAsync(new Uri(deviceAuthConfig.AuthURI), content);
 
                 if (result.StatusCode != HttpStatusCode.OK)
                 {
-                    //delete Console.WriteLine("AuthenticateKasaFirst Status Code not Ok : " + result.StatusCode.ToString());
                     throw new HttpRequestException("Kasa:AuthenticateFirst - Status Code not Ok : " + result.StatusCode.ToString());
-                    
                 }
 
                 string responseBody = await result.Content.ReadAsStringAsync();
@@ -101,32 +97,27 @@ namespace EnergyIOT.Devices
                 if (returnObject.ErrorCode != 0)
                 {
                     //Log error or retry ?
-                    //Console.WriteLine("AuthenticateKasaFirst - Error code not 0 : " + returnObject.ErrorCode.ToString());
-                    //Console.WriteLine("Error : " + returnObject.Msg);
                     throw new Exception("Kasa:AuthenticateFirst - Error code not 0 : " + returnObject.ErrorCode.ToString()
                                         + " Msg: " + returnObject.Msg);
                 }
 
                 if (returnObject.Result.Token == null)
                 {
-                    //delete Console.WriteLine("AuthenticateKasaFirst - Kasa returned token null");
-                    //return;
                     throw new Exception("Kasa:AuthenticateFirst - Kasa returned token null");
                 }
 
                 ActionGroup kasaGroup = new()
                 {
                     id = "Kasa",
-                    BaseURL = deviceAuthConfig.BaseURI,
+                    AuthURL = deviceAuthConfig.AuthURI,
+                    DeviceURL = deviceAuthConfig.DeviceURI,
                     Token = returnObject.Result.Token,
                     TerminalUUID = deviceAuthConfig.TerminalUUID,
                     RefreshToken = returnObject.Result.RefreshToken,
                     LastUpdated = DateTime.Now
                 };
 
-
                 _dataStore.SaveActionGroup(kasaGroup).GetAwaiter().GetResult();
-
             }
             catch (Exception ex)
             {
@@ -164,7 +155,6 @@ namespace EnergyIOT.Devices
                 RefreshToken = _actionGroup.RefreshToken
             };
 
-
             KasaAuthRefresh kasaAuthRefresh = new()
             {
                 Method = "refreshToken",
@@ -174,7 +164,8 @@ namespace EnergyIOT.Devices
             JsonSerializerOptions serializeOptions = new()
             {
                 //WriteIndented = true
-                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
 
             string stringcontent = System.Text.Json.JsonSerializer.Serialize(kasaAuthRefresh, serializeOptions);
@@ -183,13 +174,13 @@ namespace EnergyIOT.Devices
             var kasaClient = _httpClientFactory.CreateClient("kasaAPI");
             if (kasaClient.BaseAddress == null)
             {
-                kasaClient.BaseAddress = new Uri(deviceAuthConfig.BaseURI);
+                kasaClient.BaseAddress = new Uri(deviceAuthConfig.AuthURI);
             }
 
             //Call Refresh API
             try
             {
-                var result = await kasaClient.PostAsync(new Uri(deviceAuthConfig.BaseURI), content);
+                var result = await kasaClient.PostAsync(new Uri(deviceAuthConfig.AuthURI), content);
 
                 //check
                 if (result.StatusCode != HttpStatusCode.OK)
@@ -217,8 +208,6 @@ namespace EnergyIOT.Devices
             {
                 throw new Exception("Kasa:AuthenticateRefreshToken: clientKasaAPI.PostAsync Exception : " + ex.Message);
             }
-
-
         }
 
         public string DeviceGroupName()
@@ -236,11 +225,10 @@ namespace EnergyIOT.Devices
 
             if (clientKasaPlug.BaseAddress == null)
             {
-                clientKasaPlug.BaseAddress = new Uri(actionGroup.BaseURL);
+                clientKasaPlug.BaseAddress = new Uri(actionGroup.DeviceURL);
             }
 
             string path = "?token=" + actionGroup.Token;
-
 
             //Preepare KASA data JSON
             KasaRequestRelayState kasaRelayState = new()
@@ -288,7 +276,6 @@ namespace EnergyIOT.Devices
 
                 if (result.StatusCode != HttpStatusCode.OK)
                 {
-                    //logger.LogError("clientKasaPlug.PostAsync not Ok, Status:{}", result.StatusCode);
                     FailureAdd(triggerName, actionItem, "Status Code:" + result.StatusCode.ToString());
                 }
 
@@ -301,12 +288,10 @@ namespace EnergyIOT.Devices
                 {
                     if (returnObject.Msg != null)
                     {
-                        //logger.LogError("Kasa item error code not zero, code:{errcode} msg: {msg}", returnObject.ErrorCode, returnObject.Msg);
                         FailureAdd(triggerName, actionItem, returnObject.Msg);
                     }
                     else
                     {
-                        //logger.LogError("Kasa item error code not zero, code:{errcode} msg: null", returnObject.ErrorCode);
                         FailureAdd(triggerName, actionItem, "Null");
                     }
                 }
@@ -314,14 +299,10 @@ namespace EnergyIOT.Devices
             }
             catch (Exception ex)
             {
-                //logger.LogError("clientKasaPlug.PostAsync Fail, Msg:{msg}", ex.Message);
                 FailureAdd(triggerName, actionItem, "Exception:" + ex.Message);
             }
 
-            if (actionFailures != null)
-            { return actionFailures;  }
-            else 
-            { return []; }
+            return actionFailures;
 
         }
 
@@ -334,7 +315,7 @@ namespace EnergyIOT.Devices
         /// <param name="failureMessage">Message of the failure</param>
         private void FailureAdd(string triggerName, Action? actionItem, string failureMessage)
         {
-            if(actionFailures == null)
+            if (actionFailures == null)
             {
                 actionFailures = new();
             }

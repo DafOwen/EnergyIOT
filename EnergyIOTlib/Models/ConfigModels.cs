@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
+﻿
 // Allow "id" property name - needed by Cosmos else swap tp Newtonsoft or custom Cosmos serializer
 #pragma warning disable IDE1006 
 
@@ -60,7 +59,8 @@ public class PriceListColour
 
 public class DeviceAuthConfig
 {
-    public string BaseURI { get; set; }
+    public string AuthURI { get; set; }
+    public string DeviceURI { get; set; }
     public string Method { get; set; }
     public string AppType { get; set; }
     public string CloudUserName { get; set; }

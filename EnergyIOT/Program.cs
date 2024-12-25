@@ -12,12 +12,29 @@ var host = new HostBuilder()
         services.ConfigureFunctionsApplicationInsights();
         services.AddTransient<IDataStore, DataStoreCosmoDB>();
         services.AddTransient<IDevices, TPLinkKasa>();
-        //services.AddKeyedSingleton<IDevices, TPLinkKasa>("Kasa");
+        services.AddTransient<IDevices, TPLinkTapo>();
         services.AddHttpClient();
+
         services.AddHttpClient("kasaAPI", x =>
         {
             x.DefaultRequestHeaders.Accept.Clear();
             x.DefaultRequestHeaders.Add("Accept", "application/json");
+        });
+
+        services.AddHttpClient("tapoAPI", x =>
+        {
+            x.DefaultRequestHeaders.Accept.Clear();
+            x.DefaultRequestHeaders.Add("Accept", "application/json");
+        })
+        .ConfigurePrimaryHttpMessageHandler(() =>
+        {
+            // Allowing Untrusted SSL Certificates
+            var handler = new HttpClientHandler();
+            handler.ClientCertificateOptions = ClientCertificateOption.Manual;
+            handler.ServerCertificateCustomValidationCallback =
+                (httpRequestMessage, cert, cetChain, policyErrors) => true;
+
+            return handler;
         });
 
 

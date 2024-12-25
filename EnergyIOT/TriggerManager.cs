@@ -20,8 +20,8 @@ namespace EnergyIOT
         /// <summary>
         /// Price Manager - Fetch then call the per price (30min) Triggers
         /// </summary>
-        /// <param name="energyAPIConfig">Config values for Energy API</param>
         /// <param name="emailConfig">Emailconfig settings</param>
+        /// <param name="mode">mode e.g. Defaul</param>
         internal async Task Trigger_PerPrice_Manager(EmailConfig emailConfig, string mode)
         {
 
@@ -85,7 +85,6 @@ namespace EnergyIOT
         /// <summary>
         /// Fetch then call the Hourly (~4-11) Triggers
         /// </summary>
-        /// <param name="energyAPIConfig">Config values for Energy API</param>
         /// <param name="emailConfig">Emailconfig settings</param>
         /// <param name="unitRates">Energy unit rates</param>
         /// <param name="priceListColours">List of PriceListColour for colour coding in email</param>
@@ -319,7 +318,6 @@ namespace EnergyIOT
         /// <summary>
         /// Trigger (30min) if energy price is above or below value in trigger - handles both
         /// </summary>
-        /// <param name="dataStore">IMplementation of IDataStore - Database etc store</param>
         /// <param name="triggerItem">The trigger </param>
         public async Task Trigger_PerPrice_PriceAboveBelowValue(Trigger triggerItem)
         {
@@ -383,7 +381,6 @@ namespace EnergyIOT
         /// <summary>
         /// Trigger (30min) finds daily low section, fires if within that
         /// </summary>
-        /// <param name="dataStore">IMplementation of IDataStore - Database etc store</param>
         /// <param name="triggerItem">The trigger </param>
         public async Task Trigger_PerPrice_SectionLow(Trigger triggerItem)
         {
@@ -445,7 +442,6 @@ namespace EnergyIOT
         /// <summary>
         /// Trigger (30min) - finds daily average - fires if above or below that - handles both
         /// </summary>
-        /// <param name="dataStore">IMplementation of IDataStore - Database etc store</param>
         /// <param name="triggerItem">The trigger </param>
         public async Task Trigger_PerPrice_AverageAboveBelow(Trigger triggerItem)
         {
@@ -517,7 +513,6 @@ namespace EnergyIOT
         /// <summary>
         /// Gets single (current) price
         /// </summary>
-        /// <param name="dataStore">IMplementation of IDataStore - Database etc store</param>
         public async Task<EnergyPrice> Trigger_PerPrice_GetPrice()
         {
 
@@ -534,7 +529,6 @@ namespace EnergyIOT
         /// <summary>
         /// Gets the daily prices - but for price session e.g. 22:00-22:00 UTC
         /// </summary>
-        /// <param name="dataStore">IMplementation of IDataStore - Database etc store</param>
         public async Task<List<EnergyPrice>> Trigger_GetDaysPrices()
         {
 
@@ -575,6 +569,7 @@ namespace EnergyIOT
         /// Calculate grouped pricing averages, return orderd list lowest to higher group by no : noSections
         /// </summary>
         /// <param name="dayEnergyPrices">List of EnergyPrice - daily prices</param>
+        /// <param name="noSections">noSections - number of 30min sections</param>
         public List<(int i, string id, decimal price)> Trigger_GetSectionAverageOrdered(List<EnergyPrice> dayEnergyPrices, int noSections)
         {
             List<(int i, string id, decimal price)> sectionTotals = [];
@@ -617,7 +612,14 @@ namespace EnergyIOT
             if (nowUTC.Minute >= 45)
             {
                 //+ 1 hr - 00min
-                searchDate = new DateTime(DateOnly.FromDateTime(nowUTC), new TimeOnly(nowUTC.Hour + 1, 0, 0));
+                if (nowUTC.Hour < 23)
+                {
+                    searchDate = new DateTime(DateOnly.FromDateTime(nowUTC), new TimeOnly(nowUTC.Hour + 1, 0, 0));
+                }
+                else
+                {
+                    searchDate = new DateTime(DateOnly.FromDateTime(nowUTC).AddDays(1), new TimeOnly(0, 0, 0));
+                }
             }
             else if (nowUTC.Minute <= 15)
             {
@@ -636,7 +638,6 @@ namespace EnergyIOT
         /// <summary>
         /// Fetches days prices, calculates average
         /// </summary>
-        /// <param name="dataStore">IMplementation of IDataStore - Database etc store</param>
         public async Task<decimal> Trigger_GetDailyAverage()
         {
             List<EnergyPrice> energyPrices = [];

@@ -8,7 +8,8 @@ Built as a replacement to IFTTT which I wasn't very happy with.
 | :---: | :---: |
 | 2024-11-27 | Modes : Introducing modes where Triggers can be assigned a mode where they work e.g. only >0 or <0 price |
 | 2024-12-09 | Refactor : Refactor to enable Dependency Injection for Devices (Kasa Plugs) + move core code to library project<br> <strong>Note: Breaking changes</strong> : spelling correction done for some Environmental variables "Parition" to "Partition" e.g. Database_ActionGroupPartition <br> Also ActionGroup database entry has changed (GroupName replacing id)|
-
+| 2024-12-24 | Breaking changes:<br> Kasa environment variables BaseURI split to AuthURI + DeviceURI<br> ActionGroup changed structure |
+|  2024-12-24  | Added Tapo devices - also increased separation of Kasa code from main Library/code. |
 
 ### EnergyIOT
 
@@ -140,8 +141,9 @@ In the Azure portal these can be set in the Azure Function App : Settings -> Con
 
 Replace required values for those with "?????" or your Octopus Product/Tariff.
 
-As the four functions are in the Same Function App  they share the values.
+Device (Kasa etc) Environment variables are just for intial/refresh authorisation (URL, login, password) after that the authorisation token + url is saved to the ActionGroup database collection and used from there for plug on/off.
 
+As the four functions are in the Same Function App  they share the values.
 
 In addition to custom setting the following is used to run the Azure function on UK time (I am Uk based).
 `"WEBSITE_TIME_ZONE": "GMT Standard Time"`
@@ -152,7 +154,7 @@ In addition to custom setting the following is used to run the Azure function on
 
 ### Database Config values
 2024-11-27 Update : 
-A new database collection to save config values. This was introduced for Modes so that they can be updated via Http Funcation. Environmental variables are not suited to such updates.
+A new database collection to save config values. This was introduced for Modes so that they can be updated via Http Funcation. Environmental variables are not suited as they can't be updated across Functions from the function.
 
 <br>
 
@@ -198,7 +200,7 @@ There are two Http Triggers
 ### EnergyIOTMode
 
 The pattern to calling ths Http Trigger is:
-https://__[APP_NAME]__.azurewebsites.net/api/__EnergyIOTMode__?mode=__[MODE]__
+https://__[APP_NAME]__.azurewebsites.net/api/__EnergyIOTMode__?code=__[APP_KEY]__mode=__[MODE]__
 
 Current modes:
 
@@ -255,7 +257,7 @@ Tariff Code varies depending on your location - the above is for London.
 
 <br>
 
-## TP-Link Kasa plugs + API
+## TP-Link Kasa plugs - API
 
 Use of API to control TP-Link Kasa smart plugs. (I have 2x KP-115)
 
@@ -331,6 +333,16 @@ And header: `Content-Type: application/json`
 Check the `appServerUrl` value of the response, the URL can/is different from the above authentication calls e.g. `https://eu-wap.tplinkcloud.com`
 
 <br>
+
+## TP-Link Tapo plugs - API
+
+I started with Kasa plugs as described above.
+
+I later received a Tapo plug in exchange for a Kasa plug that had stopped working correctly.
+
+Although both are TP-Link ranges and there are some similarities/cross-over functionality - the majority is different.
+Because I've not found have as muich information about Tapo plugs / their API - I've added some additional notes in a seperate readme/.md file : [Tapo.md]()]
+
 
 ## Email
 several elements use E-mail. Either to notify me daily of the next day's new prices or to notify me of any issues.

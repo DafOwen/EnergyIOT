@@ -70,7 +70,8 @@ namespace EnergyIOT
 
             _DeviceAuthConfig.AppType = GetEnvAriableStr("KasaAuth_appType");
             _DeviceAuthConfig.Method = GetEnvAriableStr("KasaAuth_method");
-            _DeviceAuthConfig.BaseURI = GetEnvAriableStr("KasaAuth_BaseURI");
+            _DeviceAuthConfig.AuthURI = GetEnvAriableStr("KasaAuth_AuthURI");
+            _DeviceAuthConfig.DeviceURI = GetEnvAriableStr("KasaAuth_DeviceURI");
             _DeviceAuthConfig.CloudUserName = GetEnvAriableStr("KasaAuth_cloudUserName");
             _DeviceAuthConfig.CloudUserName = GetEnvAriableStr("KasaAuth_cloudPassword");
             _DeviceAuthConfig.TerminalUUID = GetEnvAriableStr("KasaAuth_terminalUUID");

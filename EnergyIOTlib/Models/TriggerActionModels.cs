@@ -39,7 +39,8 @@ public class ModesItem
 public class ActionGroup
 {
     public string id { get; set; }
-    public string BaseURL { get; set; }
+    public string AuthURL { get; set; }
+    public string DeviceURL { get; set; }
     public string Token { get; set; }
     public string RefreshToken { get; set; }
     public string TerminalUUID { get; set; }

@@ -11,8 +11,8 @@ namespace EnergyIOT
     {
         private readonly ILogger<EnergyIOTHourlyPM> _logger;
         private readonly IDataStore _dataStore;
-        private  int utcEndHour = 0;
-        private IHttpClientFactory  _httpClientFactory;
+        private int utcEndHour = 0;
+        private IHttpClientFactory _httpClientFactory;
         private readonly IEnumerable<IDevices> _devicesGroups;
 
 
@@ -30,7 +30,7 @@ namespace EnergyIOT
         public void Run([TimerTrigger("0 0 16-22 * * *")] TimerInfo myTimer)
         {
 
-            _logger.LogInformation("C# Timer trigger EnergyIOTHourlyPM executed at: {DateTime.Now}",DateTime.Now);
+            _logger.LogInformation("C# Timer trigger EnergyIOTHourlyPM executed at: {DateTime.Now}", DateTime.Now);
 
             TimeZoneInfo homeTimeZone = TimeZoneInfo.FindSystemTimeZoneById(System.Environment.GetEnvironmentVariable("WEBSITE_TIME_ZONE"));
 
@@ -61,8 +61,8 @@ namespace EnergyIOT
             }
 
             //Get colour codes for list email - non critical
-            List<PriceListColour> pricelistColours =  configManager.GetPricelistColours();
-            if(pricelistColours?.Count == 0)
+            List<PriceListColour> pricelistColours = configManager.GetPricelistColours();
+            if (pricelistColours?.Count == 0)
             {
                 _logger.LogError("Price List Colour Env Variables not found");
                 //no need to exit, non critical
@@ -80,8 +80,8 @@ namespace EnergyIOT
             {
                 //Hourly Triggers
                 TriggerManager triggerManager = new(_logger, _dataStore, _devicesGroups);
- 
-                triggerManager.Trigger_Hourly_Manager( emailConfig, unitRates, pricelistColours);
+
+                triggerManager.Trigger_Hourly_Manager(emailConfig, unitRates, pricelistColours);
             }
 
             if (myTimer.ScheduleStatus is not null)
@@ -113,11 +113,11 @@ namespace EnergyIOT
         string DateParameter()
         {
             //Get UTC period_from + period_to
-            string periodfrom = new DateTime(DateOnly.FromDateTime(DateTime.Now), 
+            string periodfrom = new DateTime(DateOnly.FromDateTime(DateTime.Now),
                                             new TimeOnly(DateParameterHour(), 0, 0))
                                             .ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'");
 
-            string periodto = new DateTime(DateOnly.FromDateTime(DateTime.Now.AddDays(1)), 
+            string periodto = new DateTime(DateOnly.FromDateTime(DateTime.Now.AddDays(1)),
                                             new TimeOnly(DateParameterHour(), 0, 0))
                                             .ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'");
 
@@ -143,7 +143,7 @@ namespace EnergyIOT
             var unitRates = await CallEnergyAPIAsync(energyConfig);
 
             //check to see if got 48 prices
-            if(unitRates == null || unitRates.Results.Count == 0)
+            if (unitRates == null || unitRates.Results.Count == 0)
             {
                 _logger.LogInformation("GetPrices - returned 0 results");
                 return null;
@@ -156,7 +156,7 @@ namespace EnergyIOT
 
             //Save results
             bool pricesSaved = await dataStore.SavePriceItems(unitRates);
-            
+
 
             if (!pricesSaved)
             {
@@ -182,7 +182,7 @@ namespace EnergyIOT
 
 
             string endpointURI = energyAPI.Section
-                    + energyAPI.Product 
+                    + energyAPI.Product
                     + energyAPI.SubSection
                     + energyAPI.TariffCode
                     + energyAPI.EndSection

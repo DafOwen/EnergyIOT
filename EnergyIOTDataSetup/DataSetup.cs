@@ -26,7 +26,7 @@ namespace EnergyIOTDataSetup
             var config = builder.Build();
             myDBConfig = config.GetSection("DatabaseConfig").Get<DatabaseConfig>();
 
-            if (myDBConfig == null )
+            if (myDBConfig == null)
             {
                 throw new ConfigurationErrorsException("DBConfig missing data");
             }
@@ -139,7 +139,7 @@ namespace EnergyIOTDataSetup
                     }
 
                 }//foreach
-                
+
                 //Config Insert
                 foreach (DBConfigString configString in dbconfigList)
                 {

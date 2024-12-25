@@ -12,7 +12,7 @@ namespace EnergyIOT
         private readonly IDataStore _dataStore;
         private readonly IEnumerable<IDevices> _devicesGroups;
 
-        public EnergyIOTPerPrice(ILogger<EnergyIOTPerPrice> logger, IDataStore dataStore,IEnumerable<IDevices> devicesGroups)
+        public EnergyIOTPerPrice(ILogger<EnergyIOTPerPrice> logger, IDataStore dataStore, IEnumerable<IDevices> devicesGroups)
         {
             _logger = logger;
             _dataStore = dataStore;

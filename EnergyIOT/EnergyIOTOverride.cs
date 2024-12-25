@@ -31,7 +31,7 @@ namespace EnergyIOT
             TimeZoneInfo homeTimeZone = TimeZoneInfo.FindSystemTimeZoneById(System.Environment.GetEnvironmentVariable("WEBSITE_TIME_ZONE"));
 
 
-#region GetConfiguration
+            #region GetConfiguration
             //Get CONFIGURATION------------------
             ConfigManagerFunction configManager;
             DatabaseConfig databaseConfig;
@@ -53,11 +53,11 @@ namespace EnergyIOT
                 _logger.LogError("EmailConfig Failure , emailConfig is null");
                 return new NotFoundObjectResult($"EmailConfig Failure , emailConfig is null");
             }
-#endregion
+            #endregion
 
-#region DataStore/DB
+            #region DataStore/DB
             _dataStore.Config(databaseConfig);
-#endregion
+            #endregion
 
 
             //start parameter

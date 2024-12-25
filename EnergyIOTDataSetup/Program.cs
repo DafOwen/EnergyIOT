@@ -32,6 +32,21 @@ namespace EnergyIOTDataSetup
                 x.DefaultRequestHeaders.Accept.Clear();
                 x.DefaultRequestHeaders.Add("Accept", "application/json");
             });
+            serviceCollection.AddHttpClient("tapoAPI", x =>
+            {
+                x.DefaultRequestHeaders.Accept.Clear();
+                x.DefaultRequestHeaders.Add("Accept", "application/json");
+            })
+            .ConfigurePrimaryHttpMessageHandler(() =>
+            {
+                // Allowing Untrusted SSL Certificates
+                var handler = new HttpClientHandler();
+                handler.ClientCertificateOptions = ClientCertificateOption.Manual;
+                handler.ServerCertificateCustomValidationCallback =
+                    (httpRequestMessage, cert, cetChain, policyErrors) => true;
+
+                return handler;
+            });
 
             var serviceProvider = serviceCollection.BuildServiceProvider();
 
@@ -50,7 +65,8 @@ namespace EnergyIOTDataSetup
                             try
                             {
                                 DataSetup.PopulateCosmosBasics(myDBConfig).GetAwaiter().GetResult();
-                            }catch(Exception err)
+                            }
+                            catch (Exception err)
                             {
                                 Console.WriteLine("PopulateCosmosBasics Err:", err);
                             }
@@ -68,7 +84,8 @@ namespace EnergyIOTDataSetup
                                 TPLinkKasa tpLinkKasa = new(dataStoreCosmoDB, httpClientFactory);
                                 tpLinkKasa.DataConfig(myDBConfig);
                                 tpLinkKasa.AuthenticateFirst(kasaAuthConfig).GetAwaiter().GetResult();
-                            }catch(Exception ex)
+                            }
+                            catch (Exception ex)
                             {
                                 Console.WriteLine("KasaFIrst Authentication Error:{0}", ex.Message);
                             }
@@ -88,6 +105,42 @@ namespace EnergyIOTDataSetup
                             catch (Exception ex)
                             {
                                 Console.WriteLine("KasaRefresh Error:{0}", ex.Message);
+                            }
+                            break;
+
+                        case "/TF":
+                            //Tapo Authenticate - First
+                            ////MUST SWITCH OFF 2FA
+                            try
+                            {
+                                var tapoAuthConfig = config.GetSection("TapoAuthConfig").Get<DeviceAuthConfig>();
+
+                                DataStoreCosmoDB dataStoreCosmoDB = new();
+                                dataStoreCosmoDB.Config(myDBConfig);
+                                TPLinkTapo tpLinkTapo = new(dataStoreCosmoDB, httpClientFactory);
+                                tpLinkTapo.DataConfig(myDBConfig);
+                                tpLinkTapo.AuthenticateFirst(tapoAuthConfig).GetAwaiter().GetResult();
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine("TapoFirst Authentication Error:{0}", ex.Message);
+                            }
+                            break;
+
+                        case "/TR":
+
+                            var tapoAuthConfigRefresh = config.GetSection("TapoAuthConfig").Get<DeviceAuthConfig>();
+                            try
+                            {
+                                DataStoreCosmoDB dataStoreCosmoDBRefresh = new();
+                                dataStoreCosmoDBRefresh.Config(myDBConfig);
+                                TPLinkTapo tpLinkTapoRefresh = new(dataStoreCosmoDBRefresh, httpClientFactory);
+                                tpLinkTapoRefresh.DataConfig(myDBConfig);
+                                tpLinkTapoRefresh.AuthenticateRefreshToken(tapoAuthConfigRefresh).GetAwaiter().GetResult();
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine("TapoRefresh Error:{0}", ex.Message);
                             }
                             break;
 
