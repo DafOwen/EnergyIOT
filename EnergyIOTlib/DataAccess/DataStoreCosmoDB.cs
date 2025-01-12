@@ -72,16 +72,10 @@ namespace EnergyIOT.DataAccess
 
             foreach (EnergyPrice priceItem in unitRates.Results)
             {
-                try
-                {
-                    ItemResponse<EnergyPrice> unitPriceResponse = await priceContainer.ReadItemAsync<EnergyPrice>(priceItem.id, new PartitionKey(priceItem.id));
-                }
-                catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
-                {
-                    ItemResponse<EnergyPrice> unitPriceResponse = await priceContainer.CreateItemAsync(priceItem, new PartitionKey(priceItem.id));
 
-                    costTotal += (int)unitPriceResponse.RequestCharge;
-                }
+                ItemResponse<EnergyPrice> unitPriceResponse = await priceContainer.UpsertItemAsync<EnergyPrice>(priceItem, new PartitionKey(priceItem.id));
+
+                costTotal += (int)unitPriceResponse.RequestCharge;               
 
                 //sleep if 0.8sec and above DatabaseRUMax (400) RU cost
                 countTimer = DateTime.Now;
@@ -275,17 +269,10 @@ namespace EnergyIOT.DataAccess
             Container actionGroupContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.ActionGroupCollection, _databaseConfig.ActionGroupPartition);
             PartitionKey partitionKey = new(_databaseConfig.ActionGroupPartition);
 
-            try
-            {
-                ItemResponse<ActionGroup> actionGroupResponse = await actionGroupContainer.ReadItemAsync<ActionGroup>(actionGroup.id, new PartitionKey(actionGroup.id));
-                //replace
-                await actionGroupContainer.UpsertItemAsync(actionGroup);
+            //Upsert - Insert or Update
+            //to cater for plug systems that can't refresh auth token - need to do full authentication.
+            ItemResponse<ActionGroup> item = await actionGroupContainer.UpsertItemAsync<ActionGroup>(actionGroup, new PartitionKey(actionGroup.id));
 
-            }
-            catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
-            {
-                ItemResponse<ActionGroup> unitPriceResponse = await actionGroupContainer.CreateItemAsync(actionGroup, new PartitionKey(actionGroup.id));
-            }
         }
 
         public async Task SetActionGroupToken(string actionGroupID, string newToken)
@@ -334,17 +321,8 @@ namespace EnergyIOT.DataAccess
             //Container
             Container overrideContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.OverrideCollection, _databaseConfig.OverridePartition);
 
-            try
-            {
-                ItemResponse<OverrideTrigger> unitPriceResponse = await overrideContainer.ReadItemAsync<OverrideTrigger>(overrideItem.id, new PartitionKey(overrideItem.id));
-                //replace
-                await overrideContainer.UpsertItemAsync(overrideItem);
+            ItemResponse<OverrideTrigger> item = await overrideContainer.UpsertItemAsync<OverrideTrigger>(overrideItem, new PartitionKey(overrideItem.id));
 
-            }
-            catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
-            {
-                ItemResponse<OverrideTrigger> unitPriceResponse = await overrideContainer.CreateItemAsync(overrideItem, new PartitionKey(overrideItem.id));
-            }
         }
 
         public async Task<OverrideTrigger> GetOverride(string idStartDate)
@@ -421,7 +399,7 @@ namespace EnergyIOT.DataAccess
                     if (responseOne.StatusCode != HttpStatusCode.OK)
                     {
                         //not log here
-                        throw new Exception("COnfig DataStore call failed");
+                        throw new Exception("Config DataStore call failed");
                     }
                     else
                     {

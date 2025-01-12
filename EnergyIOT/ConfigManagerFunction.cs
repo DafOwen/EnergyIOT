@@ -8,8 +8,6 @@ namespace EnergyIOT
         private readonly DatabaseConfig _DatabaseConfig;
         private EmailConfig _EmailConfig;
         private readonly EnergyAPIConfig _EnergyAPIConfig;
-        private DeviceAuthConfig _DeviceAuthConfig;
-
 
         public ConfigManagerFunction()
         {
@@ -64,20 +62,20 @@ namespace EnergyIOT
             return _EmailConfig;
         }
 
-        public DeviceAuthConfig GetDeviceAuthConfig()
+        public DeviceAuthConfig GetDeviceAuthConfig(string deviceGroupName)
         {
-            _DeviceAuthConfig ??= new DeviceAuthConfig();
+            DeviceAuthConfig deviceAuthConfig = new DeviceAuthConfig();
 
-            _DeviceAuthConfig.AppType = GetEnvAriableStr("KasaAuth_appType");
-            _DeviceAuthConfig.Method = GetEnvAriableStr("KasaAuth_method");
-            _DeviceAuthConfig.AuthURI = GetEnvAriableStr("KasaAuth_AuthURI");
-            _DeviceAuthConfig.DeviceURI = GetEnvAriableStr("KasaAuth_DeviceURI");
-            _DeviceAuthConfig.CloudUserName = GetEnvAriableStr("KasaAuth_cloudUserName");
-            _DeviceAuthConfig.CloudUserName = GetEnvAriableStr("KasaAuth_cloudPassword");
-            _DeviceAuthConfig.TerminalUUID = GetEnvAriableStr("KasaAuth_terminalUUID");
-            _DeviceAuthConfig.RefreshTokenNeeded = GetEnvAriableBool("KasaAuth_refreshTokenNeeded");
+            deviceAuthConfig.AppType = GetEnvAriableStr(deviceGroupName+"Auth_appType");
+            deviceAuthConfig.Method = GetEnvAriableStr(deviceGroupName+"Auth_method");
+            deviceAuthConfig.AuthURI = GetEnvAriableStr(deviceGroupName+"Auth_AuthURI");
+            deviceAuthConfig.DeviceURI = GetEnvAriableStr(deviceGroupName+"Auth_DeviceURI");
+            deviceAuthConfig.CloudUserName = GetEnvAriableStr(deviceGroupName+"Auth_cloudUserName");
+            deviceAuthConfig.CloudPassword = GetEnvAriableStr(deviceGroupName+"Auth_cloudPassword");
+            deviceAuthConfig.TerminalUUID = GetEnvAriableStr(deviceGroupName+"Auth_terminalUUID");
+            deviceAuthConfig.RefreshTokenNeeded = GetEnvAriableBool(deviceGroupName+"Auth_refreshTokenNeeded");
 
-            return _DeviceAuthConfig;
+            return deviceAuthConfig;
         }
 
 

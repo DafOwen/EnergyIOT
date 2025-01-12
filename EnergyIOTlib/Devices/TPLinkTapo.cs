@@ -43,12 +43,14 @@ namespace EnergyIOT.Devices
             }
 
 
-            //get orig ActionGroup from DB
-            _actionGroup = await _dataStore.GetActionGroup("Tapo");
-            if (_actionGroup != null)
-            {
-                throw new Exception("Tapo:AuthenticateFirst: Tapo Action Group already set - run Refresh");
-            }
+            //Previously checked to see if already exists - but with refresh not working - will need to overwrite
+            //Update Database to UpsertItemAsync
+
+            //_actionGroup = await _dataStore.GetActionGroup("Tapo");
+            //if (_actionGroup != null)
+            //{
+            //    throw new Exception("Tapo:AuthenticateFirst: Tapo Action Group already set - run Refresh");
+            //}
 
 
             TapoTryAuthenticateParams tapoAuthParams = new()
@@ -109,7 +111,7 @@ namespace EnergyIOT.Devices
                     throw new Exception("Tapo:AuthenticateFirst - Tapo returned token null, Msg:" + returnObject.Result.ErrorMsg);
                 }
 
-                ActionGroup kasaGroup = new()
+                ActionGroup tapoGroup = new()
                 {
                     id = "Tapo",
                     AuthURL = deviceAuthConfig.AuthURI,
@@ -121,7 +123,7 @@ namespace EnergyIOT.Devices
                 };
 
 
-                _dataStore.SaveActionGroup(kasaGroup).GetAwaiter().GetResult();
+                _dataStore.SaveActionGroup(tapoGroup).GetAwaiter().GetResult();
 
             }
             catch (Exception ex)
@@ -135,8 +137,8 @@ namespace EnergyIOT.Devices
         {
             //Could not find Token Refresh details, method refreshToken returns method not known error
 
-            //Could maybe just call AuthenticateFirst - will test how long auth token lasts for
-            //AuthenticateFirst(deviceAuthConfig).GetAwaiter().GetResult();
+            //token expired after a month - for now call AuthenticateFirst 
+            AuthenticateFirst(deviceAuthConfig).GetAwaiter().GetResult();
 
             return;
         }

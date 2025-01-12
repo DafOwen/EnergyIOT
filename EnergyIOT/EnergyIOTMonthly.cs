@@ -49,18 +49,19 @@ namespace EnergyIOT
                 return;
             }
 
-            DeviceAuthConfig deviceAuthConfig = configManager.GetDeviceAuthConfig();
-            if (deviceAuthConfig == null)
-            {
-                _logger.LogError($"DeviceAuth Config Failure , kasaAuthConfig is null");
-                return;
-            }
-
             #endregion
 
 
             foreach (var device in _deviceGroupList)
             {
+
+                DeviceAuthConfig deviceAuthConfig = configManager.GetDeviceAuthConfig(device.Name);
+                if (deviceAuthConfig == null)
+                {
+                    _logger.LogError($"DeviceAuth Config Failure , {device.Name}AuthConfig is null");
+                    return;
+                }
+
                 device.DataConfig(databaseConfig);
 
                 try

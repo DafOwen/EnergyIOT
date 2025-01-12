@@ -1,5 +1,13 @@
 ﻿# Tapo System
 
+
+### Updates
+| Date | Description |
+| :---: | :---: |
+| 2025-01-12 | Wuthentication token expired after a month - call AuthenticateFirst from AuthenticateRefreshToken |
+
+
+<hr>
 I initially wrote the system using (TP-Link) Kasa plugs.
 
 It looks like TP-Link have discontinued the Kasa line of products. When one of my Kasa plugs stopped working fully recently (wouldn't switch power off) TP-Link sent me a Tapo plug replacement (Tapo P110) to replace my Kasa KP115.
@@ -82,12 +90,11 @@ I've seen a setting measured by some people in the tapo App :
 
 Tapo App → Me → Tapo Lab → Third-Party Compatibility → On
 
-I don't know what this does - maybe it extends the duration of the Authroisation token. I've given it a try.
-
-As yet I've had the Tapo plug running on this code for less han a month.
+I thought this might not expire the Auth token, but this was incorrect - it expired after a month.
 
 Previously I had a simple shadow/copy action : If the Kasa was turned on - the Tapo app would turn on the Tapo plug, and visa versa.
 
+For time being - I'm going to call AuthenticateFirst from AuthenticateRefreshToken.
 
 
 ## Device List / Things
