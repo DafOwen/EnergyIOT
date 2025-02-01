@@ -11,6 +11,7 @@ Built as a replacement to IFTTT which I wasn't very happy with.
 | 2024-12-24 | Breaking changes:<br> Kasa environment variables BaseURI split to AuthURI + DeviceURI<br> ActionGroup changed structure |
 | 2024-12-24 | Added Tapo devices - also increased separation of Kasa code from main Library/code. |
 | 2025-01-12 | Tapo : Call AuthenticateFirst from AuthenticateRefreshToken <br> + Config bug fix - Inc breaking changes - some Tapo Env variables had a typo, renamed |
+| 2025-02-01 | Retry functionality on Plugs - additions to appsettings/Environment varoables |
 
 
 
