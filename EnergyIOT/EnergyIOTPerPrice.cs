@@ -47,6 +47,8 @@ namespace EnergyIOT
                 return;
 
             }
+
+            RetryConfig retryConfig = configManager.GetRetryConfig();
             #endregion
 
             #region DataStore/DB
@@ -75,7 +77,7 @@ namespace EnergyIOT
             }
 
             //Call Trigger Manager
-            TriggerManager triggerManager = new(_logger, _dataStore, _devicesGroups);
+            TriggerManager triggerManager = new(_logger, _dataStore, _devicesGroups, retryConfig);
             triggerManager.Trigger_PerPrice_Manager(emailConfig, mode).GetAwaiter().GetResult();
 
 

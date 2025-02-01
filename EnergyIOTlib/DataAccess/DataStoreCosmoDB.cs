@@ -72,10 +72,9 @@ namespace EnergyIOT.DataAccess
 
             foreach (EnergyPrice priceItem in unitRates.Results)
             {
-
                 ItemResponse<EnergyPrice> unitPriceResponse = await priceContainer.UpsertItemAsync<EnergyPrice>(priceItem, new PartitionKey(priceItem.id));
 
-                costTotal += (int)unitPriceResponse.RequestCharge;               
+                costTotal += (int)unitPriceResponse.RequestCharge;
 
                 //sleep if 0.8sec and above DatabaseRUMax (400) RU cost
                 countTimer = DateTime.Now;
@@ -100,7 +99,6 @@ namespace EnergyIOT.DataAccess
 
             using (CosmosClient client = new(_databaseConfig.EndpointURI, _databaseConfig.PrimaryKey))
             {
-
                 //DB
                 DatabaseResponse databaseResponse = await client.CreateDatabaseIfNotExistsAsync(_databaseConfig.DatabaseName);
                 Database targetDatabase = databaseResponse.Database;
@@ -118,13 +116,11 @@ namespace EnergyIOT.DataAccess
                     foreach (Trigger triggerItem in response)
                     {
                         triggers.Add(triggerItem);
-
                     }
                 }
 
                 //sort Trigger List
                 sortedTriggerList = triggers.OrderBy(o => o.Order).ToList();
-
             }
 
             return sortedTriggerList;
@@ -191,7 +187,6 @@ namespace EnergyIOT.DataAccess
 
                 //Sort
                 energyPrices = currentResultSet.OrderBy(p => p.id).ToList();
-
             }
 
             return energyPrices;
@@ -220,7 +215,6 @@ namespace EnergyIOT.DataAccess
                 {
                     itemsToFind.Add((groupID.ToString(), partitionKey));
                 }
-
 
                 //Fetch multiple
                 FeedResponse<ActionGroup> feedResponse = await actionGroupContainer.ReadManyItemsAsync<ActionGroup>(
@@ -322,7 +316,6 @@ namespace EnergyIOT.DataAccess
             Container overrideContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.OverrideCollection, _databaseConfig.OverridePartition);
 
             ItemResponse<OverrideTrigger> item = await overrideContainer.UpsertItemAsync<OverrideTrigger>(overrideItem, new PartitionKey(overrideItem.id));
-
         }
 
         public async Task<OverrideTrigger> GetOverride(string idStartDate)
@@ -340,9 +333,7 @@ namespace EnergyIOT.DataAccess
 
             try
             {
-                var parameterizedQuery = new QueryDefinition(
-                query: "SELECT * FROM ot WHERE ot.id <= @currentDateTimeUTC AND ot.EndDate >= @currentDateTimeUTC"
-            )
+                var parameterizedQuery = new QueryDefinition(query: "SELECT * FROM ot WHERE ot.id <= @currentDateTimeUTC AND ot.EndDate >= @currentDateTimeUTC")
                 .WithParameter("@currentDateTimeUTC", idStartDate);
 
                 //overrideItem = await overrideContainer.ReadItemAsync<OverrideTrigger>(idStartDate, new PartitionKey(idStartDate));
@@ -385,9 +376,7 @@ namespace EnergyIOT.DataAccess
 
                 try
                 {
-                    var parameterizedQuery = new QueryDefinition(
-                    query: "SELECT * FROM cfg WHERE cfg.id = @configName"
-                )
+                    var parameterizedQuery = new QueryDefinition(query: "SELECT * FROM cfg WHERE cfg.id = @configName")
                     .WithParameter("@configName", configName);
 
                     //overrideItem = await overrideContainer.ReadItemAsync<OverrideTrigger>(idStartDate, new PartitionKey(idStartDate));

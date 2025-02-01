@@ -15,7 +15,6 @@ namespace EnergyIOT
         private IHttpClientFactory _httpClientFactory;
         private readonly IEnumerable<IDevices> _devicesGroups;
 
-
         public EnergyIOTHourlyPM(ILogger<EnergyIOTHourlyPM> logger, IDataStore dataStore,
                                 IHttpClientFactory httpClientFactory, IEnumerable<IDevices> devicesGroups)
         {
@@ -57,7 +56,6 @@ namespace EnergyIOT
             {
                 _logger.LogError($"EmailConfig Failure , emailConfig is null");
                 return;
-
             }
 
             //Get colour codes for list email - non critical
@@ -68,6 +66,7 @@ namespace EnergyIOT
                 //no need to exit, non critical
             }
 
+            RetryConfig retryConfig = configManager.GetRetryConfig();
             #endregion
 
             #region DataStore/DB
@@ -79,8 +78,7 @@ namespace EnergyIOT
             if (unitRates != null)
             {
                 //Hourly Triggers
-                TriggerManager triggerManager = new(_logger, _dataStore, _devicesGroups);
-
+                TriggerManager triggerManager = new(_logger, _dataStore, _devicesGroups, retryConfig);
                 triggerManager.Trigger_Hourly_Manager(emailConfig, unitRates, pricelistColours);
             }
 
@@ -107,7 +105,6 @@ namespace EnergyIOT
             {
                 return utcEndHour;
             }
-
         }
 
         string DateParameter()
@@ -138,7 +135,6 @@ namespace EnergyIOT
                 return null;
             }
 
-
             //EnergyAPI stage
             var unitRates = await CallEnergyAPIAsync(energyConfig);
 
@@ -156,7 +152,6 @@ namespace EnergyIOT
 
             //Save results
             bool pricesSaved = await dataStore.SavePriceItems(unitRates);
-
 
             if (!pricesSaved)
             {
@@ -179,7 +174,6 @@ namespace EnergyIOT
             client.BaseAddress = new Uri(energyAPI.BaseURI);
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Add("Accept", "application/json");
-
 
             string endpointURI = energyAPI.Section
                     + energyAPI.Product

@@ -68,3 +68,9 @@ public class DeviceAuthConfig
     public string TerminalUUID { get; set; }
     public bool RefreshTokenNeeded { get; set; }
 }
+
+public class RetryConfig
+{
+    public int Count { get; set; }
+    public int TimeMs { get; set; }
+}

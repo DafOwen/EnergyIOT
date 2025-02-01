@@ -152,7 +152,7 @@ namespace EnergyIOT.Devices
             return _actionGroup.id;
         }
 
-        public async Task<List<ActionFailure>> Plug(ActionGroup actionGroup, Action actionItem, string triggerName)
+        public async Task<List<ActionFailure>> Plug(ActionGroup actionGroup, Action actionItem, string triggerName, RetryConfig retryConfig)
         {
             //client
             var clientTapo = _httpClientFactory.CreateClient("tapoAPI");
@@ -202,6 +202,14 @@ namespace EnergyIOT.Devices
                 var content = new StringContent(stringcontent, Encoding.UTF8, "application/json");
 
                 var result = await clientTapo.PatchAsync(plugActionURI, content);
+
+                int retries = 0;
+                while((result.StatusCode != HttpStatusCode.OK) && retryConfig.Count > retries)
+                {
+                    Thread.Sleep(retryConfig.TimeMs);
+                    result = await clientTapo.PatchAsync(plugActionURI, content);
+                    retries++;
+                }
 
                 if (result.StatusCode != HttpStatusCode.OK)
                 {

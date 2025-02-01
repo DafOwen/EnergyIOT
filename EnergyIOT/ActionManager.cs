@@ -6,7 +6,7 @@ using EnergyIOT.Devices;
 
 namespace EnergyIOT
 {
-    internal class ActionManager(ILogger logger, IDataStore dataStore, IEnumerable<IDevices> devicesGroups)
+    internal class ActionManager(ILogger logger, IDataStore dataStore, IEnumerable<IDevices> devicesGroups, RetryConfig retryConfig)
     {
         private List<ActionFailure> actionFailures;
 
@@ -52,7 +52,7 @@ namespace EnergyIOT
                 {
                     case "Plug":
                         // await Action_KasaPlug(singleActionGroup, actionItem, trigger.Name);
-                        List<ActionFailure> plugFailures = singleDevices.Plug(singleActionGroup, actionItem, trigger.Name).GetAwaiter().GetResult();
+                        List<ActionFailure> plugFailures = singleDevices.Plug(singleActionGroup, actionItem, trigger.Name, retryConfig).GetAwaiter().GetResult();
                         if (plugFailures != null)
                         {
                             actionFailures.AddRange(plugFailures);

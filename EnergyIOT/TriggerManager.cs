@@ -6,14 +6,13 @@ using EnergyIOT.Devices;
 
 namespace EnergyIOT
 {
-    internal class TriggerManager(ILogger logger, IDataStore dataStore, IEnumerable<IDevices> devicesGroups)
+    internal class TriggerManager(ILogger logger, IDataStore dataStore, IEnumerable<IDevices> devicesGroups, RetryConfig retryConfig)
     {
         private readonly ILogger _logger = logger;
         private List<ActionFailure> _actionFailures;
         private EmailConfig _emailConfig;
         private List<EnergyPrice> energyDailyPricesDB = [];
         private int utcEndHour = 0;
-
 
         //-----------------------Trigger MANAGERS ---------------------
 
@@ -361,7 +360,7 @@ namespace EnergyIOT
             if (doActions)
             {
                 LogTriggerResult("Trigger_PerPrice_PriceAboveBelowValue", triggerItem, "Fire Actions");
-                ActionManager actionManager = new(_logger, dataStore, devicesGroups);
+                ActionManager actionManager = new(_logger, dataStore, devicesGroups, retryConfig);
                 List<ActionFailure> actionFailures = await actionManager.RunActions(triggerItem);
 
                 if (actionFailures?.Count > 0)
@@ -421,7 +420,7 @@ namespace EnergyIOT
             //Do actions
             if (doAction)
             {
-                ActionManager actionManager = new(_logger, dataStore, devicesGroups);
+                ActionManager actionManager = new(_logger, dataStore, devicesGroups, retryConfig);
                 List<ActionFailure> actionFailures = await actionManager.RunActions(triggerItem);
                 LogTriggerResult("Trigger_PerPrice_PriceAboveBelowValue", triggerItem, "Fire Actions");
 
@@ -489,7 +488,7 @@ namespace EnergyIOT
             //Do actions
             if (doAction)
             {
-                ActionManager actionManager = new(_logger, dataStore, devicesGroups);
+                ActionManager actionManager = new(_logger, dataStore, devicesGroups, retryConfig);
                 List<ActionFailure> actionFailures = await actionManager.RunActions(triggerItem);
                 LogTriggerResult("Trigger_PerPrice_PriceAboveBelowValue", triggerItem, "Fire Actions");
 

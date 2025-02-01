@@ -78,6 +78,22 @@ namespace EnergyIOT
             return deviceAuthConfig;
         }
 
+        public RetryConfig GetRetryConfig()
+        {
+            RetryConfig retryConfig = new RetryConfig();
+
+            try
+            {
+                retryConfig.Count = GetEnvAriableInt("PlugRetry_Count");
+                retryConfig.TimeMs = GetEnvAriableInt("PlugRetry_TimeMs");
+            }catch(Exception Err)
+            {
+                retryConfig.Count = 0;
+                retryConfig.TimeMs = 0;
+            }
+
+            return retryConfig;
+        }
 
         public string GetEnvAriableStr(string parameterName)
         {

@@ -56,6 +56,8 @@
     "PriceColour_15.0001:20": "#FFD339",
     "PriceColour_20.0001:25": "#FFA239",
     "PriceColour_25.0001:30": "#FF7F39",
-    "PriceColour_30.0001:9999": "#FF5939"
+    "PriceColour_30.0001:9999": "#FF5939",
+    "PlugRetry_Count": 1,
+    "PlugRetry_TimeMs": 5000
   }
 }

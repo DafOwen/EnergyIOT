@@ -219,7 +219,7 @@ namespace EnergyIOT.Devices
             return _actionGroup.id;
         }
 
-        public async Task<List<ActionFailure>> Plug(ActionGroup actionGroup, Action actionItem, string triggerName)
+        public async Task<List<ActionFailure>> Plug(ActionGroup actionGroup, Action actionItem, string triggerName, RetryConfig retryConfig)
         {
             var clientKasaPlug = _httpClientFactory.CreateClient("kasaAPI");
 
@@ -269,10 +269,17 @@ namespace EnergyIOT.Devices
             string stringcontent = System.Text.Json.JsonSerializer.Serialize(kasaPassthrough, serializeOptions);
             var content = new StringContent(stringcontent, Encoding.UTF8, "application/json");
 
-
             try
             {
                 var result = await clientKasaPlug.PostAsync(path, content);
+
+                int retries = 0;
+                while ((result.StatusCode != HttpStatusCode.OK) && retryConfig.Count > retries)
+                {
+                    Thread.Sleep(retryConfig.TimeMs);
+                    result = await clientKasaPlug.PostAsync(path, content);
+                    retries++;
+                }
 
                 if (result.StatusCode != HttpStatusCode.OK)
                 {
