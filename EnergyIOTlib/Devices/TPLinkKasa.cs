@@ -283,7 +283,7 @@ namespace EnergyIOT.Devices
 
                 if (result.StatusCode != HttpStatusCode.OK)
                 {
-                    FailureAdd(triggerName, actionItem, "Status Code:" + result.StatusCode.ToString());
+                    FailureAdd(triggerName, actionItem, "Status Code:" + result.StatusCode.ToString(), "Retries:" + retries);
                 }
 
                 //Return Object
@@ -295,18 +295,18 @@ namespace EnergyIOT.Devices
                 {
                     if (returnObject.Msg != null)
                     {
-                        FailureAdd(triggerName, actionItem, returnObject.Msg);
+                        FailureAdd(triggerName, actionItem, returnObject.Msg, "ErrorCode:" + returnObject.ErrorCode + " Retries:"+retries);
                     }
                     else
                     {
-                        FailureAdd(triggerName, actionItem, "Null");
+                        FailureAdd(triggerName, actionItem, "No Error Msg", "Retries:" + retries);
                     }
                 }
 
             }
             catch (Exception ex)
             {
-                FailureAdd(triggerName, actionItem, "Exception:" + ex.Message);
+                FailureAdd(triggerName, actionItem, "Exception:" + ex.Message, "Unexpected Exception");
             }
 
             return actionFailures;
@@ -320,7 +320,7 @@ namespace EnergyIOT.Devices
         /// <param name="triggerName">Trigger name</param>
         /// <param name="actionItem">This Action</param>
         /// <param name="failureMessage">Message of the failure</param>
-        private void FailureAdd(string triggerName, Action? actionItem, string failureMessage)
+        private void FailureAdd(string triggerName, Action? actionItem, string failureMessage, string additionalDetails)
         {
             if (actionFailures == null)
             {
@@ -333,7 +333,8 @@ namespace EnergyIOT.Devices
                 ItemName = actionItem?.ItemName ?? string.Empty,
                 TriggerName = triggerName,
                 FailureDatetime = DateTime.Now.ToString("dd/mm/yyyy HH:mm:ss"), //should be UK
-                Message = failureMessage
+                Message = failureMessage,
+                Additional = additionalDetails
             };
 
             actionFailures ??= new List<ActionFailure>();

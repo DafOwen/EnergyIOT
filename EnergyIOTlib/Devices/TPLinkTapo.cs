@@ -221,11 +221,12 @@ namespace EnergyIOT.Devices
 
                         FailureAdd(triggerName, actionItem, "Status Code:" + result.StatusCode.ToString() +
                             " Msg:" + returnObject.Message +
-                            " Code:" + returnObject.Code);
+                            " Code:" + returnObject.Code,
+                            "Retries:" + retries);
                     }
                     catch (Exception ex)
                     {
-                        FailureAdd(triggerName, actionItem, "Status Code:" + result.StatusCode.ToString());
+                        FailureAdd(triggerName, actionItem, "Status Code:" + result.StatusCode.ToString(), "Retries:" + retries);
                     }
                 }//not Ok
 
@@ -266,7 +267,7 @@ namespace EnergyIOT.Devices
                     var errResult = await result.Content.ReadAsStringAsync();
                     shadowErrors = System.Text.Json.JsonSerializer.Deserialize<TaspoShadowsError>(errResult, serializeOptions);
 
-                    FailureAdd(triggerName, actionItem, "Status Code:" + result.StatusCode.ToString() + " Msg:" + shadowErrors.Message);
+                    FailureAdd(triggerName, actionItem,  "Msg:" + shadowErrors.Message, "Status Code:" + result.StatusCode.ToString());
                 }
                 else
                 {
@@ -276,7 +277,7 @@ namespace EnergyIOT.Devices
             }
             catch (Exception ex)
             {
-                FailureAdd(triggerName, actionItem, "Exception:" + ex.Message);
+                FailureAdd(triggerName, actionItem, "Exception:" + ex.Message, "Unexpected Exception");
             }
 
             return shadowsResponse;
@@ -290,7 +291,7 @@ namespace EnergyIOT.Devices
         /// <param name="triggerName">Trigger name</param>
         /// <param name="actionItem">This Action</param>
         /// <param name="failureMessage">Message of the failure</param>
-        private void FailureAdd(string triggerName, Action? actionItem, string failureMessage)
+        private void FailureAdd(string triggerName, Action? actionItem, string failureMessage, string additionalDetails)
         {
             if (actionFailures == null)
             {
@@ -303,7 +304,8 @@ namespace EnergyIOT.Devices
                 ItemName = actionItem?.ItemName ?? string.Empty,
                 TriggerName = triggerName,
                 FailureDatetime = DateTime.Now.ToString("dd/mm/yyyy HH:mm:ss"), //should be UK
-                Message = failureMessage
+                Message = failureMessage,
+                Additional = additionalDetails
             };
 
             actionFailures ??= new List<ActionFailure>();

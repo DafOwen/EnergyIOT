@@ -687,6 +687,7 @@ namespace EnergyIOT
                     message += "<br/>ActionID : " + failure.ItemId;
                     message += "<br/>DateTime : " + failure.FailureDatetime;
                     message += "<br/>Error Message : " + failure.Message;
+                    message += "<br/>Additional details : " + failure.Additional;
                     message += "<br/><br/>";
                 }
 

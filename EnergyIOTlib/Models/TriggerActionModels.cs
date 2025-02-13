@@ -54,6 +54,7 @@ public class ActionFailure
     public string TriggerName { get; set; }
     public string FailureDatetime { get; set; }
     public string Message { get; set; }
+    public string Additional { get; set; }
 }
 
 
