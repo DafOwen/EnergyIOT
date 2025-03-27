@@ -19,9 +19,9 @@
   "EnergyAPI": {
     "BaseURI": "https://api.octopus.energy",
     "Section": "/v1/products/",
-    "Product": "AGILE-23-12-06", //Product code e.g. AGILE-23-12-06
+    "Product": "AGILE-24-10-01", //Product code e.g. AGILE-24-10-01
     "SubSection": "/electricity-tariffs/",
-    "TariffCode": "E-1R-AGILE-23-12-06-C", //Tariff e.g. E-1R-AGILE-23-12-06-C
+    "TariffCode": "E-1R-AGILE-24-10-01-C", //Tariff e.g. E-1R-AGILE-24-10-01-C
     "EndSection": "/standard-unit-rates/"
   },
 

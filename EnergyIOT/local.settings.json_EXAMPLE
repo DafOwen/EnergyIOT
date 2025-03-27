@@ -8,9 +8,9 @@
     //Variables to be entered in Azure Functions Appliction Settings
     "EnergyAPI_BaseURI": "https://api.octopus.energy",
     "EnergyAPI_Section": "/v1/products/",
-    "EnergyAPI_Product": "AGILE-23-12-06",
+    "EnergyAPI_Product": "AGILE-24-10-01",
     "EnergyAPI_SubSection": "/electricity-tariffs/",
-    "EnergyAPI_TariffCode": "E-1R-AGILE-23-12-06-C",
+    "EnergyAPI_TariffCode": "E-1R-AGILE-24-10-01-C",
     "EnergyAPI_EndSection": "/standard-unit-rates/",
     "Database_EndpointURI": "https://???????????.documents.azure.com:443/",
     "Database_DatabaseName": "EnergyIOT",

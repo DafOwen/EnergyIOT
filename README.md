@@ -13,7 +13,7 @@ Built as a replacement to IFTTT which I wasn't very happy with.
 | 2025-01-12 | Tapo : Call AuthenticateFirst from AuthenticateRefreshToken <br> + Config bug fix - Inc breaking changes - some Tapo Env variables had a typo, renamed |
 | 2025-02-01 | Retry functionality on Plugs - additions to appsettings/Environment variables |
 | 2025-02-13 | ActionFailure - add additional details e.g. retry count or status code |
-
+| 2025-03-27 | Tariff update : Product: AGILE-24-10-01 Tarriff Code: E-1R-AGILE-24-10-01-C  |
 
 
 ### EnergyIOT
@@ -120,18 +120,18 @@ In several of the config files and the Environmental Variables equivalent - you 
 
 In local.settings.json / Environment variables:
 
-`"EnergyAPI_Product": "AGILE-23-12-06",`
+`"EnergyAPI_Product": "AGILE-24-10-01",`
 
-`"EnergyAPI_TariffCode": "E-1R-AGILE-23-12-06-C"`
+`"EnergyAPI_TariffCode": "E-1R-AGILE-24-10-01-C"`
 
 In appsettings.json:
 ```
 "EnergyAPI": {
     "BaseURI": "https://api.octopus.energy",
     "Section": "/v1/products/",
-    "Product": "AGILE-23-12-06",
+    "Product": "AGILE-24-10-01",
     "SubSection": "/electricity-tariffs/",
-    "TariffCode": "E-1R-AGILE-23-12-06-C",
+    "TariffCode": "E-1R-AGILE-24-10-01-C",
     "EndSection": "/standard-unit-rates/"
   },  
   ```
@@ -256,8 +256,8 @@ Only one endpoint is used to retrieve the daily prices. No authentication is nee
 https://developer.octopus.energy/docs/api/#agile-octopus
 
 E.g. of values, stored in Config file / Environment variables:
-EnergyAPI_Product: "AGILE-23-12-06"
-EnergyAPI_TariffCode: "E-1R-AGILE-23-12-06-C"
+EnergyAPI_Product: "AGILE-24-10-01"
+EnergyAPI_TariffCode: "E-1R-AGILE-24-10-01-C"
 Tariff Code varies depending on your location - the above is for London.
 
 <br>
