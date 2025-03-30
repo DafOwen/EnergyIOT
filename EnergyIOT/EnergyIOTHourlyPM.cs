@@ -15,6 +15,8 @@ namespace EnergyIOT
         private IHttpClientFactory _httpClientFactory;
         private readonly IEnumerable<IDevices> _devicesGroups;
 
+        private bool _pricesAlreadyFound = false, _priceFoundNow = false;
+
         public EnergyIOTHourlyPM(ILogger<EnergyIOTHourlyPM> logger, IDataStore dataStore,
                                 IHttpClientFactory httpClientFactory, IEnumerable<IDevices> devicesGroups)
         {
@@ -28,6 +30,7 @@ namespace EnergyIOT
         [Function("EnergyIOTHourlyPM")]
         public void Run([TimerTrigger("0 0 16-22 * * *")] TimerInfo myTimer)
         {
+            int triggerTimerLast = 22;
 
             _logger.LogInformation("C# Timer trigger EnergyIOTHourlyPM executed at: {DateTime.Now}", DateTime.Now);
 
@@ -87,6 +90,13 @@ namespace EnergyIOT
                 _logger.LogInformation("EnergyIOTHourlyPM: Next timer schedule at: {NextTime}", myTimer.ScheduleStatus.Next);
             }
 
+            //notify if last schedule and prices not found
+            if ((!_pricesAlreadyFound && !_priceFoundNow) &&
+                DateTime.Now.Hour == triggerTimerLast)
+            {
+                SendEmail.SendEmailMsg(emailConfig, _logger, "EnergyIOTHourlyPM: Prices not found", "EnergyIOTHourlyPM no (or < 48) prices found after last execution, time:" + DateTime.Now.ToString());
+            }
+
         }
 
         int DateParameterHour()
@@ -132,6 +142,7 @@ namespace EnergyIOT
             if (priceResponse != null)
             {
                 _logger.LogInformation("TestDataAlreadyGot - already got result");
+                _pricesAlreadyFound = true;
                 return null;
             }
 
@@ -149,6 +160,8 @@ namespace EnergyIOT
                 _logger.LogInformation("GetPrices - got results but not 48 :{noresults}", unitRates.Results.Count.ToString());
                 return null;
             }
+
+            _priceFoundNow = true;
 
             //Save results
             bool pricesSaved = await dataStore.SavePriceItems(unitRates);

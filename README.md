@@ -14,7 +14,7 @@ Built as a replacement to IFTTT which I wasn't very happy with.
 | 2025-02-01 | Retry functionality on Plugs - additions to appsettings/Environment variables |
 | 2025-02-13 | ActionFailure - add additional details e.g. retry count or status code |
 | 2025-03-27 | Tariff update : Product: AGILE-24-10-01 Tarriff Code: E-1R-AGILE-24-10-01-C  |
-
+| 2025-03-30 | Add email alert if EnergyIOTHourlyPM doesn't find prices for the day, last execution |
 
 ### EnergyIOT
 
