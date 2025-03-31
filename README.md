@@ -16,6 +16,7 @@ Built as a replacement to IFTTT which I wasn't very happy with.
 | 2025-03-27 | Tariff update : Product: AGILE-24-10-01 Tarriff Code: E-1R-AGILE-24-10-01-C  |
 | 2025-03-30 | Add email alert if EnergyIOTHourlyPM doesn't find prices for the day, last execution |
 | 2025-03-31 | For daylight saving - expect less prices return, added optional Env variables: GetPrices_ClocksForwardDay + GetPrices_ClocksForwardMonth |
+| 2025-03-31 | Adjust DataSetup - add TTL of 120 days to prices container to delete docs after 4 months, else adjusted manually on Azure Portal |
 
 ### EnergyIOT
 

@@ -88,7 +88,14 @@ namespace EnergyIOTDataSetup
                 Microsoft.Azure.Cosmos.Container triggerContainer = await targetDatabase.CreateContainerIfNotExistsAsync(myDBConfig.TriggerCollection, myDBConfig.TriggerPartition);
 
                 //Container - EnergyPrices
-                Microsoft.Azure.Cosmos.Container energyPricesContainer = await targetDatabase.CreateContainerIfNotExistsAsync(myDBConfig.PriceCollection, myDBConfig.PricePartition);
+                ContainerProperties properties = new()
+                {
+                    Id = myDBConfig.PriceCollection,
+                    PartitionKeyPath = myDBConfig.PricePartition,
+                    // Expire all documents after 120 days ~ 4 months
+                    DefaultTimeToLive = 120 * 60 * 60 * 24
+                };
+                Microsoft.Azure.Cosmos.Container energyPricesContainer = await targetDatabase.CreateContainerIfNotExistsAsync(properties);
 
                 //Container - Overide
                 Microsoft.Azure.Cosmos.Container overideContainer = await targetDatabase.CreateContainerIfNotExistsAsync(myDBConfig.OverrideCollection, myDBConfig.OverridePartition);
