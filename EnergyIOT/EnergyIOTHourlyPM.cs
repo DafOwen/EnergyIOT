@@ -14,6 +14,7 @@ namespace EnergyIOT
         private int utcEndHour = 0;
         private IHttpClientFactory _httpClientFactory;
         private readonly IEnumerable<IDevices> _devicesGroups;
+        private GetPricesConfig _getPricesConfig;
 
         private bool _pricesAlreadyFound = false, _priceFoundNow = false;
 
@@ -70,6 +71,8 @@ namespace EnergyIOT
             }
 
             RetryConfig retryConfig = configManager.GetRetryConfig();
+            _getPricesConfig = configManager.GetGetPricesConfig();
+
             #endregion
 
             #region DataStore/DB
@@ -149,15 +152,16 @@ namespace EnergyIOT
             //EnergyAPI stage
             var unitRates = await CallEnergyAPIAsync(energyConfig);
 
-            //check to see if got 48 prices
+            //check to see if got 48 prices or other
+            int expectedResults = ExpectedPrices();
             if (unitRates == null || unitRates.Results.Count == 0)
             {
                 _logger.LogInformation("GetPrices - returned 0 results");
                 return null;
             }
-            else if (unitRates.Results.Count < 48)
+            else if (unitRates.Results.Count < expectedResults)
             {
-                _logger.LogInformation("GetPrices - got results but not 48 :{noresults}", unitRates.Results.Count.ToString());
+                _logger.LogInformation("GetPrices - got results but not No expected ({expected}) :{noresults}", expectedResults, unitRates.Results.Count.ToString());
                 return null;
             }
 
@@ -206,6 +210,21 @@ namespace EnergyIOT
             }
 
             return unitRates;
+        }
+
+        private int ExpectedPrices()
+        {
+            int expectedPrices = 48;
+
+            //check for clocks going forward (-1 day as prices fetched day before)
+            DateTime now = DateTime.Now;
+            if (now.Month == _getPricesConfig.ClocksForwardMonth &&
+                now.AddDays(-1).Day == _getPricesConfig.ClocksForwardDay)
+            {
+                expectedPrices = 44;
+            }
+
+            return expectedPrices;
         }
 
     }

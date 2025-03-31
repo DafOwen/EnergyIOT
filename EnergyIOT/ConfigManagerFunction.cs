@@ -95,6 +95,25 @@ namespace EnergyIOT
             return retryConfig;
         }
 
+
+        public GetPricesConfig GetGetPricesConfig()
+        {
+            GetPricesConfig getPricesConfig = new GetPricesConfig();
+
+            try
+            {
+                getPricesConfig.ClocksForwardMonth = GetEnvAriableInt("GetPrices_ClocksForwardMonth");
+                getPricesConfig.ClocksForwardDay = GetEnvAriableInt("GetPrices_ClocksForwardDay");
+            }
+            catch (Exception Err)
+            {
+                getPricesConfig.ClocksForwardMonth = -1;
+                getPricesConfig.ClocksForwardDay = -1;
+            }
+
+            return getPricesConfig;
+        }
+
         public string GetEnvAriableStr(string parameterName)
         {
             string newVar = System.Environment.GetEnvironmentVariable(parameterName);

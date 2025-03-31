@@ -74,3 +74,9 @@ public class RetryConfig
     public int Count { get; set; }
     public int TimeMs { get; set; }
 }
+
+public class GetPricesConfig
+{
+    public int ClocksForwardDay { get; set; }
+    public int ClocksForwardMonth { get; set; }
+}
