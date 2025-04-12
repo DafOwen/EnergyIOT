@@ -118,30 +118,40 @@
     },
     {
       "id": "8",
-      "Name": "Hourly Notify Lowest 4 Section",
+      "Name": "Hourly Prices Summary",
       "Interval": "Hourly",
-      "Type": "Hourly_NotifyLowestSection",
+      "Type": "Hourly_Summary",
       "Order": 8,
-      "Active": true,
-      "Value": 4,
-      "ActionIDs": [ 5 ]
-    },
-    {
-      "id": "9",
-      "Name": "Hourly Below Zero",
-      "Interval": "Hourly",
-      "Type": "Hourly_NotifyPricesBelowValue",
-      "Order": 9,
       "Active": true,
       "Value": 0,
       "ActionIDs": [ 5 ]
     },
     {
+      "id": "9",
+      "Name": "Hourly Notify Lowest 4 Section",
+      "Interval": "Hourly",
+      "Type": "Hourly_NotifyLowestSection",
+      "Order": 9,
+      "Active": true,
+      "Value": 4,
+      "ActionIDs": [ 5 ]
+    },
+    {
       "id": "10",
+      "Name": "Hourly Below Zero",
+      "Interval": "Hourly",
+      "Type": "Hourly_NotifyPricesBelowValue",
+      "Order": 10,
+      "Active": true,
+      "Value": 0,
+      "ActionIDs": [ 5 ]
+    },
+    {
+      "id": "11",
       "Name": "Hourly Notify Prices",
       "Interval": "Hourly",
       "Type": "Hourly_NotifyPricesList",
-      "Order": 10,
+      "Order": 11,
       "Active": true,
       "Value": 0,
       "ActionIDs": [ 5 ]

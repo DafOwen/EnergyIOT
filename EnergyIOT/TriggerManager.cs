@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using EnergyIOT.Models;
 using EnergyIOT.DataAccess;
 using EnergyIOT.Devices;
+using System.Web;
 
 namespace EnergyIOT
 {
@@ -137,14 +138,12 @@ namespace EnergyIOT
 
                         if (notifyBelowBody.Trim() != "")
                         {
-                            notifyMessageBody += "<br/>";
                             notifyMessageBody += notifyBelowBody;
                             notifyMessageBody += "<br/><hr>";
                             notifyMessageSubject += "+ PricesBelow ";
                         }
                         else
                         {
-                            notifyMessageBody += "<br/>"; ;
                             notifyMessageBody += $"No price below value set: {triggerItem.Value.ToString()} p/kWh";
                             notifyMessageBody += "<br/><hr>";
                         }
@@ -155,10 +154,20 @@ namespace EnergyIOT
 
                         if (notifyLowestSectionBody.Trim() != "")
                         {
-                            notifyMessageBody += "<br/><br/>";
                             notifyMessageBody += notifyLowestSectionBody;
                             notifyMessageBody += "<br/><hr>";
                             notifyMessageSubject += "+ LowestSection ";
+                        }
+                        break;
+
+                    case "Hourly_Summary":
+                        string notifyPriceSummary = Trigger_Hourly_PricesSummary(triggerItem, unitRates, priceListColours);
+
+                        if (notifyPriceSummary.Trim() != "")
+                        {
+                            notifyMessageBody += "<br/><br/>";
+                            notifyMessageBody += notifyPriceSummary;
+                            notifyMessageBody += "<br/><hr>";
                         }
                         break;
                 }
@@ -265,14 +274,10 @@ namespace EnergyIOT
         /// <param name="priceListColours">Colour coding for price list email</param>
         public string Trigger_Hourly_NotifyPricesList(Trigger triggerItem, UnitRates unitRates, List<PriceListColour> priceListColours)
         {
-
             LogTriggerCall("Trigger_Hourly_NotifyPricesList", triggerItem);
 
-            string body = "";
             string table = "";
-
             decimal total = 0;
-
             string colourRow = "";
 
             //html table
@@ -290,9 +295,6 @@ namespace EnergyIOT
                     colourRow = priceListColours.Where(d => d.From <= price.ValueIncVat && d.To >= price.ValueIncVat).FirstOrDefault().Colour;
                 }
 
-
-                total += price.ValueIncVat;
-
                 table += $"<tr style=\"border: 1px solid black; border-collapse: collapse; background-color:{colourRow}\">";
                 table += "<td style=\" padding-top: 5px; padding-bottom: 5px; padding-left: 15px;  padding-right: 15px;\">" + price.ValueIncVat.ToString()
                         + "</td><td style=\" padding-top: 5px; padding-bottom: 5px; padding-left: 15px;  padding-right: 15px;\">"
@@ -302,16 +304,75 @@ namespace EnergyIOT
                 colourRow = "";
             }
 
-            table += "</table><br/>";
+            table += "</table>";
 
-            body += $"Tomorrow's average rate is {(total / unitRates.Results.Count).ToString("F")} p / kWh.";
-            body += "<br/><br/>";
-            body += table;
+            string section = "<strong>Prices</strong><br/><br/>" + table;
 
-            return body;
+            return section;
         }
 
 
+        /// <summary>
+        /// Trigger (Hourly) to notify of the daily low section
+        /// </summary>
+        /// <param name="triggerItem">The trigger </param>
+        /// <param name="unitRates">The dailt energy prices</param>
+        /// <param name="priceListColours">Colour coding for price list email</param>
+        public string Trigger_Hourly_PricesSummary(Trigger triggerItem, UnitRates unitRates, List<PriceListColour> priceListColours)
+        {
+            LogTriggerCall("Trigger_Hourly_PricesSummary", triggerItem);
+
+            string table = "";
+            decimal total = 0;
+            string minColourCel = "";
+            string maxColourCell = "";
+
+            //Average
+            total = unitRates.Results.Sum(p => p.ValueIncVat);
+            string average = (total / unitRates.Results.Count).ToString("F") + " p/kWh";
+
+            List<EnergyPrice> sortedList = unitRates.Results.OrderBy(u => u.ValueIncVat).ToList();
+
+            //Min
+            string minPrice = sortedList.First().ValueIncVat.ToString("F") + " p/kWh";
+            DateTime minDateTime = DateTime.Parse(sortedList.First().id).ToLocalTime(); //conversion to Uk
+            string minTime = minDateTime.ToString("dd/MM HH:mm");
+
+            if (priceListColours != null)
+            {
+                minColourCel = priceListColours.Where(d => d.From <= sortedList.First().ValueIncVat && d.To >= sortedList.First().ValueIncVat)
+                                                .FirstOrDefault().Colour;
+            }
+
+            //Max
+            string maxPrice = sortedList.Last().ValueIncVat.ToString("F") + " p/kWh";
+            DateTime maxDateTime = DateTime.Parse(sortedList.Last().id).ToLocalTime(); //conversion to Uk
+            string maxTime = maxDateTime.ToString("dd/MM HH:mm");
+            if (priceListColours != null)
+            {
+                maxColourCell = priceListColours.Where(d => d.From <= sortedList.Last().ValueIncVat && d.To >= sortedList.Last().ValueIncVat)
+                                                .FirstOrDefault().Colour;
+            }
+
+            table += "<table border='1' style='border-collapse:collapse'>";
+            table += "<tr><th>Lowest</th><th>Average</th><th>Highest</th></tr>";
+            table += "<tr>";
+            table += $"<td style=\" padding-top: 5px; padding-bottom: 5px; padding-left: 15px; padding-right: 15px; background-color:{minColourCel}\">";
+            table += minPrice + "</td>";
+            table += "<td style=\" padding-top: 5px; padding-bottom: 5px; padding-left: 15px;  padding-right: 15px;\">";
+            table += average + "</td>";
+            table += $"<td style=\" padding-top: 5px; padding-bottom: 5px; padding-left: 15px;  padding-right: 15px;background-color:{maxColourCell}\">";
+            table += maxPrice + "</td>";
+            table += "</tr><tr>";
+            table += $"<td style=\" padding-top: 5px; padding-bottom: 5px; padding-left: 15px;  padding-right: 15px;background-color:{minColourCel}\">";
+            table += minTime + "</td>";
+            table += "<td style=\" padding-top: 5px; padding-bottom: 5px; padding-left: 15px;  padding-right: 15px;\">&nbsp;</td>";
+            table += $"<td style=\" padding-top: 5px; padding-bottom: 5px; padding-left: 15px;  padding-right: 15px;background-color:{maxColourCell}\">";
+            table += maxTime + "</td>";
+            table += "</tr></table>";
+
+            return table;
+        }
         //--------------------Per price (30min) triggers----------------------------
 
         /// <summary>
