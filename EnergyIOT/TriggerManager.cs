@@ -191,6 +191,7 @@ namespace EnergyIOT
         public string Trigger_Hourly_PricesBelowValue(Trigger triggerItem, UnitRates unitRates)
         {
             string body = "";
+            string table = "";
 
             LogTriggerCall("Trigger_Hourly_PricesBelowValue", triggerItem);
 
@@ -208,6 +209,9 @@ namespace EnergyIOT
             {
                 body = "Sub-Value/Zero Prices found! <br /><br />";
 
+                table += "<table border='1' style='border-collapse:collapse'>";
+                table += "<tr><th style='padding: 5px;'>Time</th><th style='padding: 5px;'>Price</th></tr>";
+
                 List<EnergyPrice> pricesSorted = energyPricesBelowValue.OrderBy(o => o.id).ToList();
 
                 CultureInfo cultureInfo = new("en-GB");
@@ -217,13 +221,12 @@ namespace EnergyIOT
                     //set locale ?
                     DateTime tmpDateTime = DateTime.Parse(price.id).ToLocalTime(); //conversion to Uk Ok
 
-                    body += "Time: " + tmpDateTime.ToString(cultureInfo);
-                    body += "<br />";
-                    body += "Price: " + price.ValueIncVat;
-
-                    body += "<br /><br />";
+                    table += $"<tr><td style='padding: 5px;'>{tmpDateTime.ToString(cultureInfo)}</td><td style='padding: 5px;'>{price.ValueIncVat}</td></tr>";
                 }//foreach
 
+                table += "</table>";
+
+                body += table + "<br />";
             }
 
             return body;
