@@ -324,12 +324,18 @@ namespace EnergyIOT
 
             string table = "";
             decimal total = 0;
-            string minColourCel = "";
-            string maxColourCell = "";
+            string minColourCel = "", maxColourCell = "", averageColourCell = "";
 
             //Average
             total = unitRates.Results.Sum(p => p.ValueIncVat);
-            string average = (total / unitRates.Results.Count).ToString("F") + " p/kWh";
+            decimal averagePrice = total / unitRates.Results.Count;
+            string average = averagePrice.ToString("F") + " p/kWh";
+            if (priceListColours != null)
+            {
+                averageColourCell = priceListColours.Where(d => d.From <= averagePrice && d.To >= averagePrice)
+                                                .FirstOrDefault().Colour;
+            }
+
 
             List<EnergyPrice> sortedList = unitRates.Results.OrderBy(u => u.ValueIncVat).ToList();
 
@@ -359,14 +365,14 @@ namespace EnergyIOT
             table += "<tr>";
             table += $"<td style=\" padding-top: 5px; padding-bottom: 5px; padding-left: 15px; padding-right: 15px; background-color:{minColourCel}\">";
             table += minPrice + "</td>";
-            table += "<td style=\" padding-top: 5px; padding-bottom: 5px; padding-left: 15px;  padding-right: 15px;\">";
+            table += $"<td style=\" padding-top: 5px; padding-bottom: 5px; padding-left: 15px;  padding-right: 15px;background-color:{averageColourCell}\">";
             table += average + "</td>";
             table += $"<td style=\" padding-top: 5px; padding-bottom: 5px; padding-left: 15px;  padding-right: 15px;background-color:{maxColourCell}\">";
             table += maxPrice + "</td>";
             table += "</tr><tr>";
             table += $"<td style=\" padding-top: 5px; padding-bottom: 5px; padding-left: 15px;  padding-right: 15px;background-color:{minColourCel}\">";
             table += minTime + "</td>";
-            table += "<td style=\" padding-top: 5px; padding-bottom: 5px; padding-left: 15px;  padding-right: 15px;\">&nbsp;</td>";
+            table += $"<td style=\" padding-top: 5px; padding-bottom: 5px; padding-left: 15px;  padding-right: 15px;background-color:{averageColourCell}\">&nbsp;</td>";
             table += $"<td style=\" padding-top: 5px; padding-bottom: 5px; padding-left: 15px;  padding-right: 15px;background-color:{maxColourCell}\">";
             table += maxTime + "</td>";
             table += "</tr></table>";
