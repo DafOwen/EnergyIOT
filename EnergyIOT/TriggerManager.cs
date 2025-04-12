@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using EnergyIOT.Models;
 using EnergyIOT.DataAccess;
 using EnergyIOT.Devices;
-using System.Web;
 
 namespace EnergyIOT
 {
@@ -126,7 +125,6 @@ namespace EnergyIOT
 
                         if (notifyPricesListBody.Trim() != "")
                         {
-                            notifyMessageBody += "<br/>";
                             notifyMessageBody += notifyPricesListBody;
                             notifyMessageBody += "<br/><hr>";
                             notifyMessageSubject += "PriceList ";
@@ -150,7 +148,7 @@ namespace EnergyIOT
                         break;
 
                     case "Hourly_NotifyLowestSection":
-                        string notifyLowestSectionBody = Trigger_Hourly_NotifyLowestSection(triggerItem, unitRates);
+                        string notifyLowestSectionBody = Trigger_Hourly_NotifyLowestSection(triggerItem, unitRates, priceListColours);
 
                         if (notifyLowestSectionBody.Trim() != "")
                         {
@@ -236,9 +234,10 @@ namespace EnergyIOT
         /// </summary>
         /// <param name="triggerItem">The trigger </param>
         /// <param name="unitRates">The dailt energy prices</param>
-        public string Trigger_Hourly_NotifyLowestSection(Trigger triggerItem, UnitRates unitRates)
+        public string Trigger_Hourly_NotifyLowestSection(Trigger triggerItem, UnitRates unitRates, List<PriceListColour> priceListColours)
         {
-            string body = "";
+            string table = "";
+            string sectionColourCell = "";
 
             LogTriggerCall("Trigger_Hourly_NotifyLowestSection", triggerItem);
 
@@ -257,12 +256,25 @@ namespace EnergyIOT
             //get first - the lowest
             DateTime sectionLocalDate = DateTime.Parse(sectionTotals[0].id).ToLocalTime();
 
-            body = $"Lowest price section of the day (interval: {triggerItem.Value}) :";
-            body += "<br/>";
-            body += $"DateTime : {sectionLocalDate.ToString("dd/MM/yyyy HH:mm")} " +
-                $"<br/> Average Price : {sectionTotals[0].price.ToString("F")} p/kWh";
+            decimal sectionPrice = sectionTotals[0].price;
 
-            return body;
+            if (priceListColours != null)
+            {
+                sectionColourCell = priceListColours.Where(d => d.From <= sectionPrice && d.To >= sectionPrice)
+                                                .FirstOrDefault().Colour;
+            }
+
+            table += "<table border='1' style='border-collapse:collapse'><tr>";
+            table += "<th style=' padding: 5px;'> Interval </th><th style=' padding: 5px;'>Start Time</th><th style='padding: 5px;'>Avg Price</th></tr>";
+            table += $"<tr><td style='padding: 5px;text-align: center;'>{triggerItem.Value?.ToString("F0")}</td>";
+            table += $"<td style=' padding: 5px;text-align: center;'>{sectionLocalDate.ToString("dd/MM/yyyy HH:mm")}</th>";
+            table += $"<td style='padding: 5px; text-align: center; background-color:{sectionColourCell}'>{sectionPrice.ToString("F")} p/kWh</th>";
+            table += "</tr></table>";
+
+            string emailSection = "Lowest price section of the day:<br/><br/>";
+            emailSection += table;
+
+            return emailSection;
         }
 
 
@@ -363,17 +375,17 @@ namespace EnergyIOT
             table += "<table border='1' style='border-collapse:collapse'>";
             table += "<tr><th>Lowest</th><th>Average</th><th>Highest</th></tr>";
             table += "<tr>";
-            table += $"<td style=\" padding-top: 5px; padding-bottom: 5px; padding-left: 15px; padding-right: 15px; background-color:{minColourCel}\">";
+            table += $"<td style='padding-top: 5px; padding-bottom: 5px; padding-left: 15px; padding-right: 15px; background-color:{minColourCel}'>";
             table += minPrice + "</td>";
-            table += $"<td style=\" padding-top: 5px; padding-bottom: 5px; padding-left: 15px;  padding-right: 15px;background-color:{averageColourCell}\">";
+            table += $"<td style='padding-top: 5px; padding-bottom: 5px; padding-left: 15px;  padding-right: 15px;background-color:{averageColourCell}'>";
             table += average + "</td>";
-            table += $"<td style=\" padding-top: 5px; padding-bottom: 5px; padding-left: 15px;  padding-right: 15px;background-color:{maxColourCell}\">";
+            table += $"<td style='padding-top: 5px; padding-bottom: 5px; padding-left: 15px;  padding-right: 15px;background-color:{maxColourCell}'>";
             table += maxPrice + "</td>";
             table += "</tr><tr>";
-            table += $"<td style=\" padding-top: 5px; padding-bottom: 5px; padding-left: 15px;  padding-right: 15px;background-color:{minColourCel}\">";
+            table += $"<td style='padding-top: 5px; padding-bottom: 5px; padding-left: 15px;  padding-right: 15px;background-color:{minColourCel}'>";
             table += minTime + "</td>";
-            table += $"<td style=\" padding-top: 5px; padding-bottom: 5px; padding-left: 15px;  padding-right: 15px;background-color:{averageColourCell}\">&nbsp;</td>";
-            table += $"<td style=\" padding-top: 5px; padding-bottom: 5px; padding-left: 15px;  padding-right: 15px;background-color:{maxColourCell}\">";
+            table += $"<td style='padding-top: 5px; padding-bottom: 5px; padding-left: 15px;  padding-right: 15px;background-color:{averageColourCell}'>&nbsp;</td>";
+            table += $"<td style='padding-top: 5px; padding-bottom: 5px; padding-left: 15px;  padding-right: 15px;background-color:{maxColourCell}'>";
             table += maxTime + "</td>";
             table += "</tr></table>";
 
