@@ -18,7 +18,7 @@ Built as a replacement to IFTTT which I wasn't very happy with.
 | 2025-03-31 | For daylight saving - expect less prices return, added optional Env variables: GetPrices_ClocksForwardDay + GetPrices_ClocksForwardMonth |
 | 2025-03-31 | Adjust DataSetup - add TTL of 120 days to prices container to delete docs after 4 months, else adjusted manually on Azure Portal |
 | 2025-04-12 | Add short summary of daily prices to top of email via new trigger - Hourly_Summary |
-
+| 2025-05-31 | Add MinCheck and MaxCheck times for Trigger_PerPrice_SectionLow which specify a time span in which the check applies instead of whole day. Mainly intended for charging something ~19:30 - 9:00 e.g. Laptop ready for work next day if the lowest price section of day is later/afternoon. If MinCheck is higher than MaxCheck it spans the day: MaxCheck will be next day. |
 ### EnergyIOT
 
 Main project of the solution - Azure function app with four functions

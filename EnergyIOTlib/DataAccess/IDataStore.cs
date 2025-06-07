@@ -6,6 +6,7 @@ namespace EnergyIOT.DataAccess
     {
         void Config(DatabaseConfig dbConfig);
         Task<EnergyPrice> GetPriceItemByDate(DateTime dateToCheckUTC);
+        Task<EnergyPrice> GePriceItemLast();
         Task<bool> SavePriceItems(UnitRates unitRates);
         Task<List<Trigger>> GetPerPriceTriggers(string mode);
         Task<List<Trigger>> GetHourlyTriggersSorted();
@@ -18,5 +19,6 @@ namespace EnergyIOT.DataAccess
         Task<OverrideTrigger> GetOverride(string idStartDate);
         Task<DBConfigString> GetConfigString(string configName);
         Task SetConfigString(DBConfigString configString);
+
     }
 }

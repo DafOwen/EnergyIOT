@@ -15,8 +15,9 @@ public class Trigger
     public bool Active { get; set; }
     public decimal? Value { get; set; }
     public List<Action> Actions { get; set; }
-
     public List<ModesItem> Modes { get; set; }
+    public string? MinCheck { get; set; } 
+    public string? MaxCheck { get; set; }
 }
 
 public class Action
@@ -90,4 +91,6 @@ public class TriggerImport
     public List<int> ActionIDs { get; set; }
 
     public List<ModesItem> Modes { get; set; }
+    public string? MinCheck { get; set; }
+    public string? MaxCheck { get; set; }
 }

@@ -155,6 +155,24 @@
       "Active": true,
       "Value": 0,
       "ActionIDs": [ 5 ]
+    },
+    {
+      "id": "12",
+      "Name": "Lowest 3 sections for interval",
+      "Interval": "PerPrice",
+      "Type": "Section_Low",
+      "Order": 12,
+      "Active": true,
+      "Value": 3,
+      "ActionIDs": [ 1, 2 ],
+      "MinCheck": "19:30",
+      "MaxCheck": "9:00",
+      "Modes": [
+        {
+          "Mode": "Default",
+          "Active": true
+        }
+      ]
     }
 
   ],

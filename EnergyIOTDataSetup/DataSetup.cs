@@ -117,7 +117,9 @@ namespace EnergyIOTDataSetup
                         Order = importTrigger.Order,
                         Value = importTrigger.Value,
                         Modes = importTrigger.Modes,
-                        Active = importTrigger.Active
+                        Active = importTrigger.Active,
+                        MinCheck = importTrigger.MinCheck,
+                        MaxCheck = importTrigger.MaxCheck
                     };
 
                     List<Action> actionsList = new();

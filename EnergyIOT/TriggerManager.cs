@@ -394,6 +394,7 @@ namespace EnergyIOT
 
             return table;
         }
+        
         //--------------------Per price (30min) triggers----------------------------
 
         /// <summary>
@@ -467,6 +468,9 @@ namespace EnergyIOT
         {
             LogTriggerCall("Trigger_PerPrice_SectionLow", triggerItem);
 
+            string pricesType;
+
+            List<EnergyPrice> pricesToCheck;
 
             //CHeck No Actions
             if (triggerItem.Actions.Count == 0)
@@ -475,17 +479,28 @@ namespace EnergyIOT
                 return;
             }
 
-            //Get day's prices
-            List<EnergyPrice> dayEnergyPrices = await Trigger_GetDaysPrices();
-
-            if (dayEnergyPrices.Count == 0)
+            //if MaxCheck + MinCheck - do interval prices
+            if (!string.IsNullOrEmpty(triggerItem.MaxCheck) && !string.IsNullOrEmpty(triggerItem.MinCheck))
             {
-                _logger.LogError("Trigger_PerPrice_SectionLow - Trigger_GetDaysPrices found no prices");
+                pricesType = "Trigger_GetIntervalPrices";
+                pricesToCheck = await Trigger_GetIntervalPrices(triggerItem.MinCheck, triggerItem.MaxCheck);
+            }
+            else
+            {
+                //Get day's prices
+                pricesType = "Trigger_GetDaysPrices";
+                pricesToCheck = await Trigger_GetDaysPrices();
+            }
+ 
+
+            if (pricesToCheck.Count == 0)
+            {
+                _logger.LogError($"Trigger_PerPrice_SectionLow - {pricesType} found no prices");
                 return;
             }
 
             //Get sections + averaged price
-            List<(int i, string id, decimal price)> sectionTotals = Trigger_GetSectionAverageOrdered(dayEnergyPrices, (Int32)triggerItem.Value);
+            List<(int i, string id, decimal price)> sectionTotals = Trigger_GetSectionAverageOrdered(pricesToCheck, (Int32)triggerItem.Value);
 
             //check section v now
             DateTime checkDate = Trigger_NowSegmentDate();
@@ -494,7 +509,7 @@ namespace EnergyIOT
             bool doAction = false;
 
             // if check date == lowest section date - do actions
-            if (checkDateString == dayEnergyPrices[sectionTotals[0].i].id)
+            if (checkDateString == pricesToCheck[sectionTotals[0].i].id)
             {
                 doAction = true;
             }
@@ -504,7 +519,7 @@ namespace EnergyIOT
             {
                 ActionManager actionManager = new(_logger, dataStore, devicesGroups, retryConfig);
                 List<ActionFailure> actionFailures = await actionManager.RunActions(triggerItem);
-                LogTriggerResult("Trigger_PerPrice_PriceAboveBelowValue", triggerItem, "Fire Actions");
+                LogTriggerResult("Trigger_PerPrice_SectionLow", triggerItem, "Fire Actions");
 
                 if (actionFailures?.Count > 0)
                 {
@@ -513,7 +528,7 @@ namespace EnergyIOT
             }
             else
             {
-                LogTriggerResult("Trigger_PerPrice_PriceAboveBelowValue", triggerItem, "Skip Actions");
+                LogTriggerResult("Trigger_PerPrice_SectionLow", triggerItem, "Skip Actions");
             }
 
 
@@ -588,8 +603,7 @@ namespace EnergyIOT
 
 
 
-        //-----------------------Getting one or several prices---------------------
-
+        //-----------------------Getting one or several---------------------
 
         /// <summary>
         /// Gets single (current) price
@@ -626,6 +640,37 @@ namespace EnergyIOT
 
         }
 
+        /// <summary>
+        /// Gets Prices between two times
+        /// COuld be same or different days
+        /// </summary>
+        public async Task<List<EnergyPrice>> Trigger_GetIntervalPrices(string minCheck, string maxCheck)
+        {
+            var timeFrom = TimeOnly.Parse(minCheck);
+            var timeTo = TimeOnly.Parse(maxCheck);
+
+            DateTime dateTimeFrom = DateOnly.FromDateTime(DateTime.Now).ToDateTime(timeFrom).ToUniversalTime();
+            DateTime dateTimeTo = DateOnly.FromDateTime(DateTime.Now).ToDateTime(timeTo).ToUniversalTime();
+
+
+            if (dateTimeFrom > dateTimeTo)
+            {
+                //Overlap day
+                //get the max day in the DB - To is that, from is day -1
+                EnergyPrice lastPriceSaved = await dataStore.GePriceItemLast();
+
+                DateTime lastPriceUK = DateTime.Parse(lastPriceSaved.id).ToLocalTime();
+
+                dateTimeTo = lastPriceUK.Date + new TimeSpan(dateTimeTo.Hour, dateTimeTo.Minute, dateTimeTo.Second);
+                //from : -1 day
+                dateTimeFrom = lastPriceUK.AddDays(-1).Date + new TimeSpan(dateTimeFrom.Hour, dateTimeFrom.Minute, dateTimeFrom.Second);
+
+            }
+
+            energyDailyPricesDB = await dataStore.GetDateSpanPrices(dateTimeFrom, dateTimeTo);
+
+            return energyDailyPricesDB;
+        }
 
         int DateParameterHour()
         {

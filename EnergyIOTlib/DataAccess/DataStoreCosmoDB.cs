@@ -47,6 +47,32 @@ namespace EnergyIOT.DataAccess
             }
         }
 
+        public async Task<EnergyPrice> GePriceItemLast()
+        {
+            using CosmosClient client = new(_databaseConfig.EndpointURI, _databaseConfig.PrimaryKey);
+
+            //DB
+            DatabaseResponse databaseResponse = await client.CreateDatabaseIfNotExistsAsync(_databaseConfig.DatabaseName);
+            Database targetDatabase = databaseResponse.Database;
+
+            //Container
+            Container priceContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.PriceCollection, _databaseConfig.PricePartition);
+
+            QueryDefinition singleQuery = new QueryDefinition("SELECT TOP 1 * FROM c ORDER BY c.id DESC");
+
+            using FeedIterator<EnergyPrice> filteredFeed = priceContainer.GetItemQueryIterator<EnergyPrice>(singleQuery);
+
+            FeedResponse<EnergyPrice> responseOne = await filteredFeed.ReadNextAsync();
+            if (responseOne.StatusCode != HttpStatusCode.OK)
+            {
+                throw new Exception("GePriceItemLast DataStore call failed");
+            }
+            else
+            {
+                return responseOne.Resource.FirstOrDefault();
+            }
+        }
+
         public async Task<bool> SavePriceItems(UnitRates unitRates)
         {
             CheckConfig();
@@ -434,6 +460,5 @@ namespace EnergyIOT.DataAccess
 
             return;
         }
-
     }
 }
