@@ -13,7 +13,9 @@
     "OverrideCollection": "Override",
     "OverridePartition": "/id",
     "ConfigCollection": "Config",
-    "ConfigPartition": "/id"
+    "ConfigPartition": "/id",
+    "LowestDailyCollection": "LowestDailySection",
+    "LowestDailyPartition": "/id"
   },
 
   "EnergyAPI": {

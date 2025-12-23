@@ -144,11 +144,24 @@ namespace EnergyIOTDataSetup
                             }
                             break;
 
+                        case "/LOWEST":
+
+                            try
+                            {
+                                DataSetup.FillLowestDailySection(myDBConfig).GetAwaiter().GetResult();
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine("FillLowestDailySection Error:{0}", ex.Message);
+                            }
+                            break;
+
                         default:
                             Console.WriteLine("Options (1 at a time):");
                             Console.WriteLine("/db - Database: Populate Cosmos Database Basics");
                             Console.WriteLine("/kf - Kasa - First Authentication (2FA must be off)");
                             Console.WriteLine("/kr - Kasa - Authentication Refresh");
+                            Console.WriteLine("/Lowest - Popular Lowest daily records");
                             break;
                     }
 

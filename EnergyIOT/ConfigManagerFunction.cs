@@ -27,7 +27,9 @@ namespace EnergyIOT
                 OverrideCollection = GetEnvAriableStr("Database_OverrideCollection"),
                 OverridePartition = GetEnvAriableStr("Database_OverridePartition"),
                 ConfigCollection = GetEnvAriableStr("Database_ConfigCollection"),
-                ConfigPartition = GetEnvAriableStr("Database_ConfigPartition")
+                ConfigPartition = GetEnvAriableStr("Database_ConfigPartition"),
+                LowestDailyCollection = GetEnvAriableStr("Database_LowestDailyCollection"),
+                LowestDailyPartition = GetEnvAriableStr("Database_LowestDailyPartition")
             };
 
             ////Get EnergyAPIConfig

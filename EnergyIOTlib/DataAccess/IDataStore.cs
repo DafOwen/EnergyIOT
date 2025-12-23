@@ -19,6 +19,7 @@ namespace EnergyIOT.DataAccess
         Task<OverrideTrigger> GetOverride(string idStartDate);
         Task<DBConfigString> GetConfigString(string configName);
         Task SetConfigString(DBConfigString configString);
-
+        Task<bool> SaveDailyLowest(LowestDailySection lowestDaily);
+        Task<LowestDailySection> GetDailyLowestForPeriod(Int32 noDaysBack);
     }
 }

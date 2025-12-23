@@ -1,6 +1,6 @@
-﻿using Microsoft.Azure.Cosmos;
+﻿using EnergyIOT.Models;
+using Microsoft.Azure.Cosmos;
 using System.Net;
-using EnergyIOT.Models;
 
 namespace EnergyIOT.DataAccess
 {
@@ -459,6 +459,79 @@ namespace EnergyIOT.DataAccess
             );
 
             return;
+        }
+
+        public async Task<bool> SaveDailyLowest(LowestDailySection lowestDaily)
+        {
+            CheckConfig();
+
+            using CosmosClient client = new(_databaseConfig.EndpointURI, _databaseConfig.PrimaryKey);
+
+            //DB
+            DatabaseResponse databaseResponse = await client.CreateDatabaseIfNotExistsAsync(_databaseConfig.DatabaseName);
+            Database targetDatabase = databaseResponse.Database;
+
+            //Container
+            Container lowestDailyContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.LowestDailyCollection, _databaseConfig.LowestDailyPartition);
+
+            ItemResponse<LowestDailySection> lowestDaySectionResponse = await lowestDailyContainer.UpsertItemAsync<LowestDailySection>(lowestDaily, new PartitionKey(lowestDaily.id));
+
+            if (lowestDaySectionResponse.StatusCode != HttpStatusCode.OK)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task<LowestDailySection> GetDailyLowestForPeriod(int noDaysBack)
+        {
+            DateTime fromDate = DateTime.Now.AddDays(- noDaysBack);
+
+            DateTime dateTimeFrom = new DateTime(
+                            fromDate.Year,
+                            fromDate.Month,
+                            fromDate.Day,
+                            00, 00, 00);
+
+            DateTime dateTimeTo = new DateTime(
+                                        DateTime.Now.Year,
+                                        DateTime.Now.Month,
+                                        DateTime.Now.Day,
+                                        23, 59, 59);
+
+            using (CosmosClient client = new(_databaseConfig.EndpointURI, _databaseConfig.PrimaryKey))
+            {
+                //DB
+                DatabaseResponse databaseResponse = await client.CreateDatabaseIfNotExistsAsync(_databaseConfig.DatabaseName);
+                Database targetDatabase = databaseResponse.Database;
+
+                //Container
+                Container dailyLowestContainer = await targetDatabase.CreateContainerIfNotExistsAsync(_databaseConfig.LowestDailyCollection, _databaseConfig.LowestDailyPartition);
+
+                QueryDefinition queryDefinition = new QueryDefinition(
+                                """
+                                SELECT TOP 1 *
+                                FROM C 
+                                WHERE  c.id >= @dateFrom and c.id <= @dateTo
+                                ORDER BY c.AvgValueIncVat ASC
+                                """)
+                                    .WithParameter("@dateFrom", dateTimeFrom)
+                                    .WithParameter("@dateTo", dateTimeTo);
+
+                using FeedIterator<LowestDailySection> filteredFeed = dailyLowestContainer.GetItemQueryIterator<LowestDailySection>(queryDefinition);
+
+                FeedResponse<LowestDailySection> responseOne = await filteredFeed.ReadNextAsync();
+                if (responseOne.StatusCode != HttpStatusCode.OK)
+                {
+                    throw new Exception("GetDailyLowestForPeriod DataStore call failed");
+                }
+                else
+                {
+                    return responseOne.Resource.FirstOrDefault();
+                }
+
+            }
         }
     }
 }

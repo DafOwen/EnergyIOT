@@ -19,6 +19,8 @@ public class DatabaseConfig
     public string OverridePartition { get; set; }
     public string ConfigCollection { get; set; }
     public string ConfigPartition { get; set; }
+    public string LowestDailyCollection { get; set; }
+    public string LowestDailyPartition { get; set; }
 }
 
 public class EmailConfig

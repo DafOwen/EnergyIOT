@@ -1,8 +1,10 @@
-﻿using System.Net;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Azure.Cosmos;
-using System.Configuration;
+﻿using EnergyIOT.DataAccess;
 using EnergyIOT.Models;
+using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Net;
 using Action = EnergyIOT.Models.Action;
 
 namespace EnergyIOTDataSetup
@@ -281,6 +283,98 @@ namespace EnergyIOTDataSetup
             }
 
             _startDateTimeStrUTC = _startDateTimeUTC.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'");
+        }
+
+        public static async Task FillLowestDailySection(DatabaseConfig myDBConfig)
+        {
+            DateTime dateTimeFrom = new DateTime(
+                DateTime.Now.Year,
+                DateTime.Now.Month,
+                DateTime.Now.Day,
+                00, 00, 00);
+
+            DateTime dateTimeTo = new DateTime(
+                DateTime.Now.Year,
+                DateTime.Now.Month,
+                DateTime.Now.Day,
+                23, 59, 59);
+
+            Int32 noDaysLess = 0;
+
+            using (CosmosClient client = new CosmosClient(myDBConfig.EndpointURI, myDBConfig.PrimaryKey))
+            {
+
+                try
+                {
+                    DatabaseResponse databaseResponse = await client.CreateDatabaseIfNotExistsAsync(myDBConfig.DatabaseName, myDBConfig.DatabaseRUMax);
+                    Database targetDatabase = databaseResponse.Database;
+
+                    //Container - LowestDaily
+                    Microsoft.Azure.Cosmos.Container lowestDailyContainer = await targetDatabase.CreateContainerIfNotExistsAsync(myDBConfig.LowestDailyCollection, myDBConfig.LowestDailyPartition);
+
+                    DataStoreCosmoDB dataStoreCosmoDB = new();
+                    dataStoreCosmoDB.Config(myDBConfig);
+
+                    List<EnergyPrice> prices = await dataStoreCosmoDB.GetDateSpanPrices(dateTimeFrom, dateTimeTo);
+
+                    while (prices.Any())
+                    {
+                        List<(int i, string id, decimal price)> sectionTotals = GetSectionAverageOrdered(prices, 4);
+
+                        LowestDailySection lowestDaily = new()
+                        {
+                            id = sectionTotals[0].id,
+                            AvgValueIncVat = sectionTotals[0].price,
+                            NoIntervals = 4
+                        };
+
+                        ItemResponse<LowestDailySection> lowestDaySectionResponse = await lowestDailyContainer.UpsertItemAsync<LowestDailySection>(lowestDaily, new PartitionKey(lowestDaily.id));
+
+                        if (lowestDaySectionResponse.StatusCode != HttpStatusCode.Created)
+                        {
+                            Console.WriteLine("Not Inserted : " + sectionTotals[0].id);
+                        }
+
+                        prices = null;
+                        lowestDaily = null;
+                        noDaysLess--;
+                        prices = await dataStoreCosmoDB.GetDateSpanPrices(dateTimeFrom.AddDays(noDaysLess), dateTimeTo.AddDays(noDaysLess));
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Err: " + ex.Message);
+                }
+            }
+        }
+
+        internal static List<(int i, string id, decimal price)> GetSectionAverageOrdered(List<EnergyPrice> dayEnergyPrices, int noSections)
+        {
+            List<(int i, string id, decimal price)> sectionTotals = [];
+
+            //sort by date to start early, go to late
+            dayEnergyPrices.Sort((x, y) => x.id.CompareTo(y.id));
+
+            decimal shortCycleTotal = 0;
+
+            for (int i = 0; i < dayEnergyPrices.Count - noSections; i++)
+            {
+                shortCycleTotal = 0;
+
+                for (int j = 0; j < noSections; j++)
+                {
+                    shortCycleTotal += dayEnergyPrices[i + j].ValueIncVat;
+                }
+
+                sectionTotals.Add((i, dayEnergyPrices[i].id, shortCycleTotal / noSections));
+
+            }
+
+            //order by decimal/average price to get lowest first
+            sectionTotals = sectionTotals.OrderBy(valuetuple => valuetuple.price).ToList();
+
+            return sectionTotals;
         }
 
     }

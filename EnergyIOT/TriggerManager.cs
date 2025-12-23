@@ -148,7 +148,7 @@ namespace EnergyIOT
                         break;
 
                     case "Hourly_NotifyLowestSection":
-                        string notifyLowestSectionBody = Trigger_Hourly_NotifyLowestSection(triggerItem, unitRates, priceListColours);
+                        string notifyLowestSectionBody = await Trigger_Hourly_NotifyLowestSection(triggerItem, unitRates, priceListColours);
 
                         if (notifyLowestSectionBody.Trim() != "")
                         {
@@ -237,7 +237,7 @@ namespace EnergyIOT
         /// </summary>
         /// <param name="triggerItem">The trigger </param>
         /// <param name="unitRates">The dailt energy prices</param>
-        public string Trigger_Hourly_NotifyLowestSection(Trigger triggerItem, UnitRates unitRates, List<PriceListColour> priceListColours)
+        public async Task<string> Trigger_Hourly_NotifyLowestSection(Trigger triggerItem, UnitRates unitRates, List<PriceListColour> priceListColours)
         {
             string table = "";
             string sectionColourCell = "";
@@ -260,6 +260,21 @@ namespace EnergyIOT
             DateTime sectionLocalDate = DateTime.Parse(sectionTotals[0].id).ToLocalTime();
 
             decimal sectionPrice = sectionTotals[0].price;
+
+            //Save lowest section price for other use
+            LowestDailySection lowestDailySection = new()
+            {
+                id = sectionTotals[0].id,
+                AvgValueIncVat = sectionPrice,
+                NoIntervals = (Int32)triggerItem.Value
+            };
+
+            bool saveOk = await dataStore.SaveDailyLowest(lowestDailySection);
+            if (!saveOk)
+            {
+                _logger.LogWarning("SaveDailyLowest Failed saving daily lowest");
+            }
+
 
             if (priceListColours != null)
             {
