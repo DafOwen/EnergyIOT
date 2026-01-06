@@ -19,6 +19,8 @@ Built as a replacement to IFTTT which I wasn't very happy with.
 | 2025-03-31 | Adjust DataSetup - add TTL of 120 days to prices container to delete docs after 4 months, else adjusted manually on Azure Portal |
 | 2025-04-12 | Add short summary of daily prices to top of email via new trigger - Hourly_Summary |
 | 2025-05-31 | Add MinCheck and MaxCheck times for Trigger_PerPrice_SectionLow which specify a time span in which the check applies instead of whole day. Mainly intended for charging something ~19:30 - 9:00 e.g. Laptop ready for work next day if the lowest price section of day is later/afternoon. If MinCheck is higher than MaxCheck it spans the day: MaxCheck will be next day. |
+| 2025-12-24 | Save the Lowest section of the day, calculated for email, but now in Cosmos Collection : LowestDailySection. <br/>  Use this for Trigger_PerPrice_SectionLowMultiDays trigger. <br/>New Env settings : Database_LowestDailyCollection + Database_LowestDailyPartition <br/> (Added a new Tepo plug with intention of charging batteries etc, lowest period in 1-3 months) |
+
 ### EnergyIOT
 
 Main project of the solution - Azure function app with four functions
@@ -183,7 +185,7 @@ Hourly triggers - when fetched next day's prices.
 
 - __Trigger_Hourly_NotifyPricesList__ - If prices found, email a list
 - __Trigger_Hourly_PricesBelowValue__ - If price below set value, mention in the email
-- __Trigger_Hourly_NotifyLowestSection__ - Calculate lowest daily section
+- __Trigger_Hourly_NotifyLowestSection__ - Calculate lowest daily section, Previously was just for notification email but later saved to a new Cosmos COllwction
 
 Per price/30min triggers
 
@@ -191,6 +193,7 @@ They are similar to Octopus/IFTTT triggers but I left out the time interval.
 - __Trigger_PerPrice_PriceAboveBelowValue__ - Trigger if price is above or below set value, depending if "Above" or "Bellow" in trigger name
 - __Trigger_PerPrice_SectionLow__ - Calculate lowest period in the day for set number of 30min prices, trigger if in that time
 - __Trigger_PerPrice_AverageAboveBelow__ - Trigger if current price above or below daily avaerage
+- __Trigger_PerPrice_SectionLowMultiDays__ - Trigger to find if section within lowest sction collection for pas X days
 
 Unlike IFTTT - they are not set for a specific timespan.
 
@@ -353,7 +356,7 @@ Because I've not found have as muich information about Tapo plugs / their API - 
 
 
 ## Email
-several elements use E-mail. Either to notify me daily of the next day's new prices or to notify me of any issues.
+Several elements use E-mail. Either to notify me daily of the next day's new prices or to notify me of any issues.
 
 For this I've used my personal gmail account.
 

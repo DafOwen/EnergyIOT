@@ -4,7 +4,7 @@
 ### Updates
 | Date | Description |
 | :---: | :---: |
-| 2025-01-12 | Wuthentication token expired after a month - call AuthenticateFirst from AuthenticateRefreshToken |
+| 2025-01-12 | Authentication token expired after a month - call AuthenticateFirst from AuthenticateRefreshToken |
 
 
 <hr>

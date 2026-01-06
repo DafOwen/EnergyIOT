@@ -76,7 +76,7 @@
       "Order": 5,
       "Active": true,
       "Value": null,
-      "ActionIDs": [ 3, 4 ],
+      "ActionIDs": [ 3, 4, 7 ],
       "Modes": [
         {
           "Mode": "Default",
@@ -173,8 +173,23 @@
           "Active": true
         }
       ]
+    },
+    {
+      "id": "13",
+      "Name": "Lowest from multi daily lowest",
+      "Interval": "PerPrice",
+      "Type": "SectionLow_Multi_Day",
+      "Order": 5,
+      "Active": true,
+      "Value": 4,
+      "ActionIDs": [ 6 ],
+      "Modes": [
+        {
+          "Mode": "Default",
+          "Active": true
+        }
+      ]
     }
-
   ],
 
 
@@ -218,6 +233,22 @@
       "Stateto": 0,
       "Deviceid": "",
       "Type": "Email"
+    },
+    {
+      "Itemid": 6,
+      "GroupId": "Tapo",
+      "Itemname": "Kitchen Plug",
+      "Stateto": 1, //on
+      "Deviceid": "????????????????????????????????????????????????",
+      "Type": "Plug"
+    },
+    {
+      "Itemid": 7,
+      "GroupId": "Tapo",
+      "Itemname": "Kitchen Plug",
+      "Stateto": 0, //off
+      "Deviceid": "????????????????????????????????????????????????",
+      "Type": "Plug"
     }
   ],
 
