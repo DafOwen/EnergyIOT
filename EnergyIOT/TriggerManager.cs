@@ -66,6 +66,10 @@ namespace EnergyIOT
                     case "Average_Below":
                         Trigger_PerPrice_AverageAboveBelow(triggerItem).GetAwaiter().GetResult();
                         break;
+
+                    case "SectionLow_Multi_Day":
+                        Trigger_PerPrice_SectionLowMultiDays(triggerItem).GetAwaiter().GetResult();
+                        break;
                 }
             }
 
@@ -616,7 +620,60 @@ namespace EnergyIOT
 
         }
 
+        /// <summary>
+        /// Trigger (30min) finds if price is lowest section from multiple days
+        /// </summary>
+        /// <param name="triggerItem">The trigger </param>
+        public async Task Trigger_PerPrice_SectionLowMultiDays(Trigger triggerItem)
+        {
+            LogTriggerCall("Trigger_PerPrice_SectionLowMultiDays", triggerItem);
 
+            string pricesType;
+
+            List<EnergyPrice> pricesToCheck;
+
+            //Check No Actions
+            if (triggerItem.Actions.Count == 0)
+            {
+                _logger.LogInformation("Trigger_PerPrice_SectionLowMultiDays - finds no Actions");
+                return;
+            }
+
+            //get current price matching 30 min time
+            DateTime searchDate = Trigger_NowSegmentDate();
+
+            EnergyPrice priceDB = await dataStore.GetPriceItemByDate(searchDate);
+
+            if (priceDB == null)
+            {
+                _logger.LogError("Trigger_PerPrice_SectionLowMultiDays - Trigger_PerPrice_GetPrice NO prices");
+                return;
+            }
+
+            LowestDailySection lowSection = await dataStore.GetDailyLowestForPeriod((Int32)triggerItem.Value);
+
+            DateTime lowestLow =  DateTime.Parse(lowSection.id).ToLocalTime();
+            DateTime lowestTop = DateTime.Parse(lowSection.id).AddMinutes(4 * 30).ToLocalTime();
+
+
+            //Do Actions or not
+            if (lowestLow <= DateTime.Now && DateTime.Now <= lowestTop)
+            {
+                ActionManager actionManager = new(_logger, dataStore, devicesGroups, retryConfig);
+                List<ActionFailure> actionFailures = await actionManager.RunActions(triggerItem);
+                LogTriggerResult("Trigger_PerPrice_SectionLowMultiDays", triggerItem, "Fire Actions");
+
+                if (actionFailures?.Count > 0)
+                {
+                    _actionFailures.AddRange(actionFailures);
+                }
+            }
+            else
+            {
+                LogTriggerResult("Trigger_PerPrice_SectionLowMultiDays", triggerItem, "Skip Actions");
+            }
+
+        }
 
         //-----------------------Getting one or several---------------------
 
