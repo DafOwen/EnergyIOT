@@ -58,7 +58,7 @@
       "Interval": "PerPrice",
       "Type": "Price_Below",
       "Order": 4,
-      "Active": true,
+      "Active": false,
       "Value": 13,
       "ActionIDs": [ 1, 2 ],
       "Modes": [
