@@ -20,6 +20,7 @@ Built as a replacement to IFTTT which I wasn't very happy with.
 | 2025-04-12 | Add short summary of daily prices to top of email via new trigger - Hourly_Summary |
 | 2025-05-31 | Add MinCheck and MaxCheck times for Trigger_PerPrice_SectionLow which specify a time span in which the check applies instead of whole day. Mainly intended for charging something ~19:30 - 9:00 e.g. Laptop ready for work next day if the lowest price section of day is later/afternoon. If MinCheck is higher than MaxCheck it spans the day: MaxCheck will be next day. |
 | 2025-12-24 | Save the Lowest section of the day, calculated for email, but now in Cosmos Collection : LowestDailySection. <br/>  Use this for Trigger_PerPrice_SectionLowMultiDays trigger. <br/>New Env settings : Database_LowestDailyCollection + Database_LowestDailyPartition <br/> (Added a new Tepo plug with intention of charging batteries etc, lowest period in 1-3 months) |
+| 2026-03-15 | Update to .Net 10 |
 
 ### EnergyIOT
 
