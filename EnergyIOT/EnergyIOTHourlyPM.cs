@@ -219,12 +219,32 @@ namespace EnergyIOT
             //check for clocks going forward (-1 day as prices fetched day before)
             DateTime now = DateTime.Now;
             if (now.Month == _getPricesConfig.ClocksForwardMonth &&
-                now.AddDays(-1).Day == _getPricesConfig.ClocksForwardDay)
+                now.AddDays(+1).Day == GetLastSundayOfMonth(_getPricesConfig.ClocksForwardMonth))
             {
                 expectedPrices = 44;
             }
 
             return expectedPrices;
+        }
+
+        private int GetLastSundayOfMonth(int monthNumber)
+        {
+            int year = DateTime.Now.Year;
+            int daysInMonth = DateTime.DaysInMonth(year, monthNumber);
+            DateTime lastDayOfMonth = new(year, monthNumber, daysInMonth);
+
+            // Iterate backwards from the last day to find the last Sunday
+            for (int day = daysInMonth; day > 0; day--)
+            {
+                DateTime date = new(year, monthNumber, day);
+                if (date.DayOfWeek == DayOfWeek.Sunday)
+                {
+                    return day;
+                }
+            }
+
+            // Should never reach here for valid months, but return _getPricesConfig.ClocksForwardDayas fallback
+            return _getPricesConfig.ClocksForwardDay;
         }
 
     }
