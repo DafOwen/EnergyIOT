@@ -512,7 +512,7 @@ namespace EnergyIOT.DataAccess
                 QueryDefinition queryDefinition = new QueryDefinition(
                                 """
                                 SELECT TOP 1 *
-                                FROM C 
+                                FROM c 
                                 WHERE  c.id >= @dateFrom and c.id <= @dateTo
                                 ORDER BY c.AvgValueIncVat ASC
                                 """)
